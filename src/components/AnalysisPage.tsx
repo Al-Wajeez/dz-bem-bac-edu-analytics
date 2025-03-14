@@ -716,7 +716,7 @@ export function AnalysisPage({ data, isDarkMode }: AnalysisPageProps) {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className={`bg-white rounded-lg p-6 max-w-6xl w-full ${isDarkMode ? 'nav-dark' : 'nav-light'}`}>
+        <div className={`bg-white rounded-lg p-6 max-w-6xl w-full ${isDarkMode ? 'nav-dark' : ''}`}>
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium">{title}</h3>
             <button
@@ -893,17 +893,17 @@ export function AnalysisPage({ data, isDarkMode }: AnalysisPageProps) {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className={`bg-white rounded-lg p-6 max-w-xl w-full shadow-lg ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
+        <div className={`bg-white rounded-lg p-6 max-w-xl w-full shadow-lg ${isDarkMode ? 'dark-mode' : ''}`}>
           <h3 className="text-lg font-medium mb-4">تصفية النتائج</h3>
           <div className="space-y-4">
             {Object.entries(filerFields).map(([section, fields]) => (
               <div key={section}>
                 <h4 className="font-medium mb-2">{section}</h4>
-                <div className={`grid grid-cols-2 gap-4 ${isDarkMode ? 'columnMenu-dark' : 'columnMenu-light'}`}>
+                <div className={`grid grid-cols-2 gap-4 ${isDarkMode ? 'columnMenu-dark' : ''}`}>
                   {/* Row 1 */}
                   {fields.slice(0, 3).map((field) => (
-                    <div key={field} className={`mb-2 ${isDarkMode ? 'nav-dark' : 'nav-light'}`}>
-                      <label className={`block text-sm font-medium text-gray-700 ${isDarkMode ? 'columnMenu-dark' : 'columnMenu-light'}`}>{field}</label>
+                    <div key={field} className={`mb-2 ${isDarkMode ? 'nav-dark' : ''}`}>
+                      <label className={`block text-sm font-medium text-gray-700 ${isDarkMode ? 'columnMenu-dark' : ''}`}>{field}</label>
                       {renderSelect(field, Array.from(
                         new Set(
                           data
@@ -1029,13 +1029,13 @@ export function AnalysisPage({ data, isDarkMode }: AnalysisPageProps) {
   };
   
   return (
-    <div className={`container mx-auto px-4 py-6 mt-16 ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
-      <div className={`mb-6 flex justify-between items-center ${isDarkMode ? 'nav-dark' : 'nav-light'}`}>
+    <div className={`container mx-auto px-4 py-6 mt-16 ${isDarkMode ? 'dark-mode' : ''}`}>
+      <div className={`mb-6 flex justify-between items-center ${isDarkMode ? 'nav-dark' : ''}`}>
         <h2 className="text-2xl font-bold">تحليل بيانات - {institution}</h2>
         <div className="flex space-x-4 gap-4">
         <button
           onClick={() => setShowFilterModal(true)}
-            className={`flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 ${isDarkMode ? 'button-dark hover:bg-gray-900' : 'button-light'}`}
+            className={`flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 ${isDarkMode ? 'button-dark hover:bg-gray-900' : ''}`}
         >
           تصفية الجداول
           <Filter className="w-4 h-4 mr-2" />
@@ -1060,7 +1060,7 @@ export function AnalysisPage({ data, isDarkMode }: AnalysisPageProps) {
       )}
 
       {Object.entries(allFields).map(([section, fields]) => (
-        <div key={section} className={`mb-8 ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
+        <div key={section} className={`mb-8 ${isDarkMode ? 'dark-mode' : ''}`}>
           <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'table-white' : 'table-black'}`}>{section}</h3>
           {fields.map(field => renderAnalysisTable(field, `توزيع ${field}`))}
         </div>

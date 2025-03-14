@@ -195,7 +195,7 @@ export function EditForm({ data, onSubmit, onClose, isDarkMode }: EditFormProps)
                 backgroundColor: isSelected
                   ? isDarkMode
                     ? '#64748B'
-                    : '#222529'
+                    : '#F1F5F9'
                   : isFocused
                   ? isDarkMode
                     ? '#334155'
