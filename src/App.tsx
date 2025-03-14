@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { Upload,
   Database,
   Filter,
@@ -21,6 +22,7 @@ import { EditForm } from './components/EditForm';
 import { AnalysisPage } from './components/AnalysisPage';
 import { GlobalAnalysisPage } from './components/GlobalAnalysisPage';
 import { createColumnHelper } from '@tanstack/react-table';
+
 
 export default function App() {
   const [data, setData] = useState<any[]>([]);
@@ -675,6 +677,7 @@ export default function App() {
           )}
         </>
       )}
+      <Analytics />
     </div>
   );
 }
