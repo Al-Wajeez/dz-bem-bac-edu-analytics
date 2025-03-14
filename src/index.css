@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: 'Cairo';
+    src: url('./fonts/Cairo-VariableFont_slnt,wght.ttf') format('truetype');
+    font-weight: 100 1000; /* Variable font weight range */
+    font-stretch: 25% 151%; /* Optional: Variable font stretch range */
+}
+
+body {
+    font-family: 'Cairo', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+}
+
+/* THEME GLOBALE */
+.light-mode {
+    background-color: #fff;
+    color: #222529;
+}
+
+.dark-mode {
+    background-color: #222529; /* Dark background */
+    color: #a1a1a8; /* Light text */
+}
+
+/* THEME NAV */
+.nav-light {
+    background-color: #fff; /* Darker background for nav */
+}
+
+.nav-dark {
+    background-color: #222529; /* Darker background for nav */
+    border-bottom: 1px solid #222529 ; /* Dark border */
+}
+
+/* THEME TABLE */
+.table-dark {
+    background-color: #222529; /* Darker background for nav */
+    border-bottom: 1px solid #222529 ; /* Dark border */
+}
+
+.table-body-dark {
+    background-color: #222529; /* Darker background for nav */
+    border-top: 0.5px #ff0000 ; /* Dark border */
+}
+
+/* THEME BUTTON */
+.button-dark {
+    color: #066ac9;
+    background-color: rgba(6, 106, 201, 0.1);
+    border: rgba(6, 106, 201, 0.1);
+}
+
+.button-failed-dark{
+    color: #e2a4ab;
+    background-color: hsl(351.11deg 30.34% 17.45%);
+    border: rgba(6, 106, 201, 0.1);
+}
+
+.button-info-dark{
+    color: #6edff6;
+    background-color: #032830;
+    border: #087990;
+}
+
+.button-success-dark{
+    color: #75b798;
+    background-color: #051b11;
+    border: #0f5132;
+}
+
+.button-warning-dark{
+    color: #e1ad70;
+    background-color: #3f3831;
+    border: #997404;
+}
+
+/* THEME COLUMN MENU */
+.columnMenu-dark{
+    background-color: #222529; /* Dark background */
+    color: #fff; /* Light text */
+    border: #222529;
+}
+
+
+/* Add this to your global CSS file */
+.ReactModal__Overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .ReactModal__Content {
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+  }
