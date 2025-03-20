@@ -25,9 +25,9 @@ export function EditForm({ data, onSubmit, onClose, isDarkMode }: EditFormProps)
 
   // Modified renderMultiSelect with proper typing
   const renderMultiSelect = (name: string, options: string[]) => (
-    <Controller 
-      name={name}
-      control={control}
+  <Controller 
+    name={name} 
+    control={control} 
       render={({ field }) => {
         // Handle all possible value formats
         const value = (() => {
@@ -161,18 +161,21 @@ export function EditForm({ data, onSubmit, onClose, isDarkMode }: EditFormProps)
           : field.value;
 
         return (
-          <Select
-            {...field}
-            isMulti={isMulti}
+      <Select 
+      {...field} 
+      isMulti={isMulti} 
             options={options.map(opt => ({ value: opt, label: opt }))}
             value={value}
-            onChange={(newValue) => field.onChange(newValue)}
+            onChange={(newValue) => {
+              // For single select, pass just the value
+              field.onChange(isMulti ? newValue : newValue?.value || newValue);
+            }}
             getOptionValue={(option) => option.value}
             isOptionSelected={(option) => value?.value === option.value}
-            className="mt-1"
-            classNamePrefix="select"
-            placeholder="اختر..."
-            noOptionsMessage={() => "لا توجد خيارات"}
+    className="mt-1" 
+    classNamePrefix="select" 
+    placeholder="اختر..." 
+    noOptionsMessage={() => "لا توجد خيارات"} 
             styles={{
               control: (base, state) => ({
                 ...base,
@@ -402,6 +405,27 @@ export function EditForm({ data, onSubmit, onClose, isDarkMode }: EditFormProps)
     ]
   };
 
+  const handleFormSubmit = handleSubmit((formData) => {
+    // Process the form data before submitting
+    const processedData = Object.entries(formData).reduce((acc, [key, value]) => {
+      // Handle select fields
+      if (value && typeof value === 'object') {
+        if (Array.isArray(value)) {
+          // Handle multi-select
+          acc[key] = value.map(v => v.value || v).join(', ');
+        } else {
+          // Handle single select
+          acc[key] = value.value || value;
+        }
+      } else {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as Record<string, any>);
+
+    onSubmit(processedData);
+  });
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className={`bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden ${isDarkMode ? 'dark-mode' : ''}`}>
@@ -417,7 +441,7 @@ export function EditForm({ data, onSubmit, onClose, isDarkMode }: EditFormProps)
         </button>
       </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className={`p-6 overflow-y-auto max-h-[calc(90vh-8rem)] ${isDarkMode ? 'dark-mode' : ''}`} dir="rtl">
+        <form onSubmit={handleFormSubmit} className={`p-6 overflow-y-auto max-h-[calc(90vh-8rem)] ${isDarkMode ? 'dark-mode' : ''}`} dir="rtl">
           <div className="space-y-8">
             {Object.entries(sections).map(([sectionTitle, fields]) => (
               <div key={sectionTitle} className={`border rounded-xl p-6 bg-gray-50 ${isDarkMode ? 'columnMenu-dark' : ''}`}>
@@ -448,7 +472,7 @@ export function EditForm({ data, onSubmit, onClose, isDarkMode }: EditFormProps)
                   {/*-------------- المعلومات العامة --------------*/}
                   {sectionTitle === 'المعلومات العامة' ? (
                   <>
-
+                    
                     <div className="flex gap-4 col-span-2">
                       {fields
                         .filter(
