@@ -360,12 +360,12 @@ export default function App() {
       'الجنس',
       'الإعادة',
       'القسم',
-    'المديرية',
-    'المؤسسة',
+      'المديرية',
+      'المؤسسة',
       'السوابق الصحية',
       'مكان الميلاد',
       'العنوان',
-      'عدد الإخوذ الذكور',
+      'عدد الإخوة الذكور',
       'عدد الاخوة الاناث',
       'رتبته في العائلة',
       'مهنة الاب',
@@ -375,10 +375,10 @@ export default function App() {
       'المستوى الدراسي للأم',
       'هل الأم متوفية',
       'هل الأبوين منفصلان',
-    'هل لديه كفيل',
-    'متابعة الأب',
-    'متابعة الأم',
-    'متابعة الكفيل',
+      'هل لديه كفيل',
+      'متابعة الأب',
+      'متابعة الأم',
+      'متابعة الكفيل',
       'المواد المفضلة',
       'سبب تفضيلها',
       'المواد الصعبة',
@@ -412,11 +412,8 @@ export default function App() {
   
     // Define select fields and their types
     const selectFieldsConfig: Record<string, 'single' | 'multi'> = {
-      'المديرية': 'single',
-      'المؤسسة': 'single',
       'الجنس': 'single',
       'الإعادة': 'single',
-      'القسم': 'single',
       'مهنة الاب': 'single',
       'المستوى الدراسي للأب': 'single',
       'هل الأب متوفي': 'single',
@@ -456,10 +453,16 @@ export default function App() {
         if (selectFieldsConfig[column]) {
           if (selectFieldsConfig[column] === 'multi') {
             // Handle multi-select arrays
-            acc[column] = Array.isArray(value) 
-              ? value.map((v: any) => v?.label || v).join(', ') 
-              : '';
-          } else {
+            if (Array.isArray(value)) {
+              // If it's an array of objects with value/label properties
+              acc[column] = value.map(v => v?.label || v?.value || v).join(',');
+            } else if (typeof value === 'string') {
+              // If it's a string, split by comma and join with Arabic comma
+              acc[column] = value.split(',').map(v => v.trim()).join(',');
+            } else {
+              acc[column] = '';
+            }
+        } else {
             // Handle single select objects
             acc[column] = value?.label || value?.value || value || '';
           }
@@ -541,7 +544,7 @@ export default function App() {
                 <button
                   onClick={() => {
                     setShowGlobalAnalysis(true);
-                    setShowStudentList(false);
+                    setShowAnalysis(false);
                     setShowStudentList(false);
                   }}
                   disabled={data.length === 0}
@@ -550,8 +553,8 @@ export default function App() {
                       ? `text-orange-600 hover:text-orange-800 bg-orange-50 rounded-lg ${isDarkMode ? 'text-orange-400 hover:text-orange-500 bg-orange-900' : ''}`
                       : 'text-gray-500 hover:text-gray-700'} 
                     ${isDarkMode && !showGlobalAnalysis ? 'text-gray-400 hover:text-gray-300' : ''}`}
-                  >
-                    تحليل شامل
+                >
+                  تحليل شامل
                   </button>
 
                   <button

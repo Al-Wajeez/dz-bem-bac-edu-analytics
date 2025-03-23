@@ -20,64 +20,62 @@ export function GlobalAnalysisPage({ data, isDarkMode }: GlobalAnalysisPageProps
 
   // Define analysis fields
   const analysisFields = [
-    'الجنس', 'الإعادة', 'القسم', 'السوابق الصحية', 'مكان', 
-    'عدد الإخوة الذكور', 'عدد الاخوة الاناث', 'الرتبة في العائلة',
-    'مهنة الاب', 'المستوى الدراسي للأب', 'هل الأب متوفي', 
-    'مهنة الأم', 'المستوى الدراسي للأم', 'هل الأم متوفية',
-    'هل الأبوين منفصلان', 'هل لديك كفيل', 'متابعة الأب', 
-    'متابعة الأم', 'متابعة الكفيل', 'المواد المفضلة', 
-    'المواد الصعبة', 'الجذع المشترك المرغوب', 
-    'المواد المميزة للجذع', 'المهنة المستقبلية', 
-    'المستوى الدراسي المطلوب', 'قطاع العمل المرغوب',
-    'هل لك نشاط ترفيهي', 'أوقات الفراغ',
-    'هل لديك معلومات كافية عن مشروعك',
-    'هل تعاني من صعوبات دراسية', 'هل لديك مشكل للمناقشة'
+    'الجنس', 'الإعادة', 'القسم', 'السوابق الصحية', 'مكان', 'عدد الإخوة الذكور', 'عدد الاخوة الاناث', 'الرتبة في العائلة',
+    'مهنة الاب', 'المستوى الدراسي للأب', 'هل الأب متوفي', 'مهنة الأم', 'المستوى الدراسي للأم', 'هل الأم متوفية',
+    'هل الأبوين منفصلان', 'هل لديك كفيل', 'متابعة الأب', 'متابعة الأم', 'متابعة الكفيل', 'المواد المفضلة', 
+    'المواد الصعبة', 'الجذع المشترك المرغوب', 'المواد المميزة للجذع', 'المهنة المستقبلية', 'المستوى الدراسي المطلوب', 'قطاع العمل المرغوب',
+    'هل لك نشاط ترفيهي', 'أوقات الفراغ', 'هل لديك معلومات كافية عن مشروعك', 'هل تعاني من صعوبات دراسية', 'هل لديك مشكل للمناقشة'
   ];
+
+  const checkFormCompletion = (item: any) => {
+    const requiredFields = [
+      'المؤسسة', 'المديرية', 'اللقب و الاسم', 'الجنس', 'الإعادة', 'القسم', 'السوابق الصحية', 'تاريخ الميلاد',
+      'مكان الميلاد', 'العنوان', 'عدد الإخوة الذكور', 'عدد الاخوة الاناث', 'رتبته في العائلة', 'مهنة الاب',
+      'المستوى الدراسي للأب', 'هل الأب متوفي', 'مهنة الأم', 'المستوى الدراسي للأم', 'هل الأم متوفية', 'هل الأبوين منفصلان',
+      'هل لديه كفيل', 'متابعة الأب', 'متابعة الأم', 'متابعة الكفيل', 'المواد المفضلة', 'سبب تفضيلها', 'المواد الصعبة',
+      'سبب صعوبتها', 'الجذع المشترك المرغوب', 'المواد المميزة للجذع', 'سبب اهتمامه بالدراسة',
+      'ممن يطلب المساعدة عند الصعوبة', 'وسيلة أخرى لفهم الدروس', 'هل تشجعه معاملة الأستاذ', 'هل تحفزه مكافأة والديه',
+      'هل ناقش مشروعه الدراسي مع والديه', 'سبب عدم مناقشته لمشروعه الدراسي', 'سبب اهتمامه بالدراسة',
+      'أسباب أخرى للاهتمام بالدراسة', 'المهنة التي يتمناها في المستقبل', 'سبب اختيارها', 'المستوى الدراسي الذي تتطلبه المهنة',
+      'القطاع المرغوب للعمل فيه', 'قطاعات أخرى مهتم بها', 'هل لديه نشاط ترفيهي', 'كيف يقضي أوقات فراغه', 'مجالات أخرى للترفيه',
+      'هل لديه معلومات كافية حول مشروعه المستقبلي', 'ما المعلومات التي يحتاجها', 'هل يعاني من صعوبات دراسية', 'ما هي الصعوبات',
+      'هل لديه مشكلة يريد مناقشتها','ما هي المشكلة'
+    ];
+
+    const numericFields = ['عدد الإخوة الذكور', 'عدد الاخوة الاناث', 'رتبته في العائلة'];
+  
+    const missingFields = requiredFields.filter(field => {
+      const value = item[field];
+  
+      // Allow 0 as a valid entry for numeric fields
+      if (numericFields.includes(field)) {
+        return value === null || value === undefined || value === '';
+      }
+  
+      // For all other fields, check if they are empty
+      return value === undefined || value === null || value === '';
+    });
+
+    if (missingFields.length > 0) {
+      console.log(`❌ Missing fields for student in ${item['القسم']}:`, missingFields);
+    }
+  
+    return missingFields.length === 0;
+  };
 
   // Function to calculate participation analysis by section
   const participationBySection = () => {
-    // First replicate the completion check from DataTable
-    const checkCompletion = (item: any) => {
-      const requiredFields = [
-        'السوابق الصحية',
-      'مكان',
-      'القسم',
-      'العنوان',
-      'عدد الإخوة الذكور',
-      'عدد الاخوة الاناث',
-      'الرتبة في العائلة',
-      'مهنة الاب',
-      'المستوى الدراسي للأب',
-      'هل الأب متوفي',
-      'مهنة الأم',
-      'المستوى الدراسي للأم',
-      'هل الأم متوفية',
-      'هل الأبوين منفصلان',
-      'هل لديك كفيل',
-      'المواد المفضلة',
-      'المواد الصعبة',
-      'الجذع المشترك المرغوب',
-      'المواد المميزة للجذع',
-      'المهنة المستقبلية',
-      'المستوى الدراسي المطلوب',
-      'قطاع العمل المرغوب',
-      'هل لك نشاط ترفيهي',
-      'أوقات الفراغ',
-      'هل لديك معلومات كافية عن مشروعك',
-      'هل تعاني من صعوبات دراسية',
-      'هل لديك مشكل للمناقشة'
-      ];
-      return requiredFields.every(field => item[field]);
-    };
-
     const sections = Array.from(new Set(data.map(item => item['القسم'])));
+    
     return sections.map(section => {
       const sectionData = data.filter(item => item['القسم'] === section);
       const totalParticipants = sectionData.length;
-      const completeCount = sectionData.filter(item => checkCompletion(item)).length;
+      
+      // Use checkFormCompletion instead of checkCompletion
+      const completeCount = sectionData.filter(item => checkFormCompletion(item)).length;
       const incompleteCount = totalParticipants - completeCount;
       const percentage = totalParticipants > 0 ? (completeCount / totalParticipants) * 100 : 0;
-      
+  
       return { 
         section, 
         totalParticipants: completeCount, 
@@ -85,7 +83,7 @@ export function GlobalAnalysisPage({ data, isDarkMode }: GlobalAnalysisPageProps
         percentage 
       };
     });
-  };
+  };  
 
   const sectionStats = participationBySection();
 
@@ -99,18 +97,53 @@ export function GlobalAnalysisPage({ data, isDarkMode }: GlobalAnalysisPageProps
     const valueCounts = data.reduce((acc, item) => {
       let value = item[selectedField];
 
-      // Handle cases where value is an object or array
+      // Handle multi-select arrays
       if (Array.isArray(value)) {
-        value.forEach(v => {
-          const val = typeof v === 'object' ? v.label || v.value || 'بدون إجابة' : v || 'بدون إجابة';
-          acc[val] = (acc[val] || 0) + 1;
+        if (value.length === 0) {
+          acc['بدون إجابة'] = (acc['بدون إجابة'] || 0) + 1;
+        } else {
+          // Process each value in the array separately
+          value.forEach(v => {
+            let displayValue;
+            if (typeof v === 'object' && v !== null) {
+              // Handle object with label/value properties
+              displayValue = v.label || v.value;
+            } else {
+              // Handle primitive values
+              displayValue = v;
+            }
+            if (displayValue) {
+              acc[displayValue] = (acc[displayValue] || 0) + 1;
+            }
+          });
+        }
+      }
+      // Handle string values that might contain multiple selections
+      else if (typeof value === 'string' && value.includes(',')) {
+        // Split the string by comma and process each value
+        value.split(',').forEach(v => {
+          const trimmedValue = v.trim();
+          if (trimmedValue) {
+            acc[trimmedValue] = (acc[trimmedValue] || 0) + 1;
+          }
         });
-      } else if (typeof value === 'object' && value !== null) {
-        value = value.label || value.value || 'بدون إجابة';
-        acc[value] = (acc[value] || 0) + 1;
+      }
+      // Handle single values
+      else if (typeof value === 'object' && value !== null) {
+        // Handle single object with label/value properties
+        const displayValue = value.label || value.value;
+        if (displayValue) {
+          acc[displayValue] = (acc[displayValue] || 0) + 1;
+        } else {
+          acc['بدون إجابة'] = (acc['بدون إجابة'] || 0) + 1;
+        }
       } else {
-        value = value || 'بدون إجابة'; // Handle undefined or empty values
-        acc[value] = (acc[value] || 0) + 1;
+        // Handle primitive values
+        if (value) {
+          acc[value] = (acc[value] || 0) + 1;
+        } else {
+          acc['بدون إجابة'] = (acc['بدون إجابة'] || 0) + 1;
+        }
       }
 
       return acc;
@@ -172,12 +205,50 @@ export function GlobalAnalysisPage({ data, isDarkMode }: GlobalAnalysisPageProps
 
     for (const section in groupedData) {
       crossTabulatedData[section] = {};
-      totalCounts[section] = 0;
+      totalCounts[section] = groupedData[section].length; // Set total count to number of students in section
 
       groupedData[section].forEach((item) => {
-        const value = item[field] || 'غير محدد';
-        crossTabulatedData[section][value] = (crossTabulatedData[section][value] || 0) + 1;
-        totalCounts[section] += 1;
+        let value = item[field];
+
+        // Handle multi-select arrays
+        if (Array.isArray(value)) {
+          if (value.length === 0) {
+            crossTabulatedData[section]['بدون إجابة'] = (crossTabulatedData[section]['بدون إجابة'] || 0) + 1;
+          } else {
+            // Process each value in the array separately
+            value.forEach(v => {
+              if (typeof v === 'object' && v !== null) {
+                // Handle object with label/value properties
+                const displayValue = v.label || v.value || 'غير محدد';
+                crossTabulatedData[section][displayValue] = (crossTabulatedData[section][displayValue] || 0) + 1;
+              } else {
+                // Handle primitive values
+                crossTabulatedData[section][v] = (crossTabulatedData[section][v] || 0) + 1;
+              }
+            });
+          }
+        }
+        // Handle string values that might contain multiple selections
+        else if (typeof value === 'string' && value.includes(',')) {
+          // Split the string by comma and process each value
+          value.split(',').forEach(v => {
+            const trimmedValue = v.trim();
+            if (trimmedValue) {
+              crossTabulatedData[section][trimmedValue] = (crossTabulatedData[section][trimmedValue] || 0) + 1;
+            }
+          });
+        }
+        // Handle single object values
+        else if (typeof value === 'object' && value !== null) {
+          const displayValue = value.label || value.value || 'غير محدد';
+          crossTabulatedData[section][displayValue] = (crossTabulatedData[section][displayValue] || 0) + 1;
+        }
+        // Handle primitive values
+        else if (value) {
+          crossTabulatedData[section][value] = (crossTabulatedData[section][value] || 0) + 1;
+        } else {
+          crossTabulatedData[section]['بدون إجابة'] = (crossTabulatedData[section]['بدون إجابة'] || 0) + 1;
+        }
       });
     }
 

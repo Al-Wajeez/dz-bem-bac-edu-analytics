@@ -62,24 +62,30 @@ export function AnalysisPage({ data, isDarkMode }: AnalysisPageProps) {
   
     filteredData.forEach(item => {
       let value = item[field];
-      let hasValidEntries = false;
   
       // Handle multi-select arrays
       if (Array.isArray(value)) {
         if (value.length === 0) {
           counts['بدون إجابة'] = (counts['بدون إجابة'] || 0) + 1;
         } else {
+          // Process each value in the array separately
           value.forEach(v => {
             const displayValue = v?.label || v?.value || v;
             if (displayValue) {
               counts[displayValue] = (counts[displayValue] || 0) + 1;
-              hasValidEntries = true;
             }
           });
-          if (!hasValidEntries) {
-            counts['بدون إجابة'] = (counts['بدون إجابة'] || 0) + 1;
-          }
         }
+      }
+      // Handle string values that might contain multiple selections
+      else if (typeof value === 'string' && value.includes(',')) {
+        // Split the string by comma and process each value
+        value.split(',').forEach(v => {
+          const trimmedValue = v.trim();
+          if (trimmedValue) {
+            counts[trimmedValue] = (counts[trimmedValue] || 0) + 1;
+          }
+        });
       }
       // Handle single values
       else {

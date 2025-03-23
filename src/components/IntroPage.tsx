@@ -1,6 +1,8 @@
 import React from 'react';
-import { TabletSmartphone, ExternalLink } from 'lucide-react';
+import { TabletSmartphone, ExternalLink, QrCode } from 'lucide-react';
 import favicon from '../images/favicon.png'; // Import the image
+import dashboard from '../images/dashboard.png'; // Import the image
+import telegram from '../images/telegram.png'; // Import the image
 import { TrueFocus } from "../components/ui/true-focus"; // Import the TrueFocus component
 import { HighlighterItem, HighlightGroup, Particles } from "../components/ui/highlighter"; // Import the Highlighter components
 import { useAnimate } from "framer-motion";
@@ -60,6 +62,24 @@ const IntroPage: React.FC<IntroPageProps> = ({ setShowIntro }) => {
   return (
   
     <div className="min-h-screen bg-gray-50 text-white" dir="rtl">
+      <div className="fixed top-4 right-4 z-50" dir="rtl">
+        <div className="group relative">
+          <div 
+            className="flex items-top text-gray-800 rounded-lg hover:shadow-lg hover:bg-white hover:shadow-md transition-all duration-300 overflow-hidden"
+          >
+            <div className="p-3">
+              <QrCode className="w-7 h-7 animate-pulse" />
+            </div>
+            <div className="max-w-0 group-hover:max-w-xs group-hover:max-h-xs transition-all duration-500 ease-in-out overflow-hidden whitespace-nowrap">
+              <img
+                src={telegram} // Use the imported image
+                alt="Telegram"
+                className="w-32 h-32 md:w-32 md:h-32 rounded-lg transition-transform duration-500"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
       <HighlightGroup>
       <HighlighterItem>
       {/* Main Content */}
@@ -129,13 +149,13 @@ const IntroPage: React.FC<IntroPageProps> = ({ setShowIntro }) => {
             <div className="relative w-full pt-12 px-4 sm:px-6 lg:px-8">
               <div className="flex relative z-10 overflow-hidden border rounded-md shadow-[0_0_50px_-12px_rgba(0,0,0,0.3)] dark:shadow-[0_0_50px_-12px_rgba(255,255,255,0.1)] border-brand/10 dark:border-brand/5">
                 <img
-                  alt="AI Platform Dashboard"
+                  alt="Al Wajeez Platform Dashboard"
                   width="1248"
                   height="765"
                   className="w-full h-auto transition-transform duration-300 hover:scale-104"
                   loading="lazy"
                   decoding="async"
-                  src="https://www.launchuicomponents.com/app-light.png"
+                  src={dashboard}
                 />
               </div>
             </div>
