@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { X, Save, ArrowLeft, FilePlus2 } from 'lucide-react';
 import Select from 'react-select';
+import { useState } from "react";
 
 interface EditFormProps {
   data: any;
@@ -242,6 +243,113 @@ export function EditForm({ data, onSubmit, onClose, isDarkMode }: EditFormProps)
     );
   };
 
+  // Function to determine options based on 'المؤسسة' field
+  const getOptionsForInstitution = (institution: string) => {
+    if (institution.startsWith('متوسطة')) {
+      return [
+        'جذع مشترك آداب',
+        'جذع مشترك علوم وتكنولوجيا'
+      ];
+    } else if (institution.startsWith('ثانوية')) {
+      return [
+        'آداب وفلسفة',
+        'لغات اجنبية',
+        'فنون',
+        'رياضيات',
+        'علوم تجريبسة',
+        'تقني رياضي',
+        'تسيير واقتصاد'
+      ];
+    }
+    return [];
+  };
+
+  const getOptionsForSubjects = (subjects: string) => {
+    if (subjects.startsWith('متوسطة')) {
+      return [
+        'الرياضيات',
+        'العلوم الفيزيائية',
+        'العلوم الطبيعية',
+        'اللغة العربية',
+        'اللغة الفرنسية',
+        'اللغة الإنجليزية',
+        'اللغة الأمازيغية',
+        'التاريخ والجغرافيا',
+        'التربية الإسلامية',
+        'التربية المدنية'
+      ];
+    } else if (subjects.startsWith('ثانوية')) {
+      return [
+        
+        'الرياضيات',
+        'العلوم الفيزيائية',
+        'علوم الطبيعة والحياة',
+        'العلوم الإسلامية',
+        'التاريخ والجغرافيا',
+        'اللغة العربية وآدابها',
+        'اللغة الفرنسية',
+        'اللغة الإنجليزية',
+        'المعلوماتية',
+        'التربية الفنية',
+        'تكنولوجيا',
+        'اللغة الأمازيغية',
+      ];
+    }
+    return [];
+  };
+  
+  const getOptionsForFeaturedSubjects = (subjects: string) => {
+    if (subjects.startsWith('متوسطة')) {
+      return [
+        'الرياضيات',
+        'العلوم الفيزيائية',
+        'علوم الطبيعة والحياة',
+        'العلوم الإسلامية',
+        'التاريخ والجغرافيا',
+        'اللغة العربية وآدابها',
+        'اللغة الفرنسية',
+        'اللغة الإنجليزية',
+        'اللغة الأمازيغية',
+        'المعلوماتية',
+        'التربية الفنية',
+        'تكنولوجيا',
+      ];
+    } else if (subjects.startsWith('ثانوية')) {
+      return [
+        
+        'الرياضيات',
+        'العلوم الفيزيائية',
+        'علوم الطبيعة والحياة',
+        'التكنولوجيا',
+        'هندسة الكهربائية',
+        'هندسة الطرائق',
+        'هندسة المكانيكية',
+        'ت. المحاسبي و المالي',
+        'الاقتصاد والمناجمنت',
+        'القانون',
+        'الفلسفة',
+        'العلوم الإسلامية',
+        'التاريخ والجغرافيا',
+        'اللغة العربية وآدابها',
+        'اللغة الفرنسية',
+        'اللغة الإنجليزية',
+        'اللغة الإسبانية',
+        'اللغة الألمانية',
+        'اللغة الإيطالية',
+        'اللغة الأمازيغية',
+        'المعلوماتية',
+        'التربية الفنية', 
+      ];
+    }
+    return [];
+  };
+
+  // Watch the 'المؤسسة' field to dynamically update options
+  const institution = watch('المؤسسة');
+  const optionsForTrunk = getOptionsForInstitution(institution);
+  const optionsForSubjects = getOptionsForSubjects(institution);
+  const optionsForFeaturedSubjects = getOptionsForFeaturedSubjects(institution);
+
   const sections = {
     'معلومات المؤسسة': [
       { name: 'المديرية'},
@@ -280,56 +388,26 @@ export function EditForm({ data, onSubmit, onClose, isDarkMode }: EditFormProps)
       { 
         name: 'المواد المفضلة',
         type: 'select',
-        options: [
-          'الرياضيات',
-          'العلوم الفيزيائية',
-          'العلوم الطبيعية',
-          'اللغة العربية',
-          'اللغة الفرنسية',
-          'اللغة الإنجليزية',
-          'التاريخ والجغرافيا',
-          'العلوم الإسلامية',
-          'التربية المدنية'
-        ],
+        options: optionsForSubjects,
         isMulti: true
       },
       { name: 'سبب تفضيلها', type: 'text' },
       { 
         name: 'المواد الصعبة',
         type: 'select',
-        options: [
-          'الرياضيات',
-          'العلوم الفيزيائية',
-          'العلوم الطبيعية',
-          'اللغة العربية',
-          'اللغة الفرنسية',
-          'اللغة الإنجليزية',
-          'التاريخ والجغرافيا',
-          'العلوم الإسلامية',
-          'التربية المدنية'
-        ],
+        options: optionsForSubjects,
         isMulti: true
       },
       { name: 'سبب صعوبتها', type: 'text' },
       { 
         name: 'الجذع المشترك المرغوب',
         type: 'select',
-        options: ['جذع مشترك آداب', 'جذع مشترك علوم وتكنولوجيا']
+        options: optionsForTrunk
       },
       { 
         name: 'المواد المميزة للجذع',
         type: 'select',
-        options: [
-          'اللغة العربية وآدابها',
-          'الرياضيات',
-          'العلوم الفيزيائية',
-          'علوم الطبيعة والحياة',
-          'العلوم الإسلامية',
-          'التاريخ والجغرافيا',
-          'اللغة الفرنسية',
-          'اللغة الإنجليزية',
-          'تكنولوجيا'
-        ],
+        options: optionsForFeaturedSubjects,
         isMulti: true
       },
       {
@@ -452,7 +530,7 @@ export function EditForm({ data, onSubmit, onClose, isDarkMode }: EditFormProps)
                   {sectionTitle === 'معلومات المؤسسة' ? (
                   <>
 
-                    <div className={`flex gap-4 col-span-2 ${isDarkMode ? 'columnMenu-dark' : ''}`}>
+                    <div className="flex gap-4 col-span-2">
                       {fields
                         .filter(
                           (field) =>

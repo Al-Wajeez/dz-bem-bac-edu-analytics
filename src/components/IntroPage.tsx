@@ -96,7 +96,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ setShowIntro }) => {
         <div className="container mx-auto px-12 py-2 flex flex-col items-center">
           <a href="/">
             <div className="inline-flex items-center rounded-full border px-2.5 py-2 mb-4 text-xs transition-colors focus:outline-green focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-200">
-              <span className="text-green-800">أخر تحديث 15 مارس 2025 - 🎉 إضافة التحليل الشامل</span>
+              <span className="text-green-800">أخر تحديث 25 مارس 2025 - 🎉 إضافة التحليل الشامل</span>
             </div>
           </a>
 
@@ -105,8 +105,8 @@ const IntroPage: React.FC<IntroPageProps> = ({ setShowIntro }) => {
           <div className="w-full flex justify-center mb-8">
             <img
               src={favicon} // Use the imported image
-              alt="Hero Image"
-              className="w-32 h-32 md:w-32 md:h-32 rounded-lg transition-transform duration-500 hover:scale-110 hover:rotate-12"
+              alt="Al Wajeez Logo"
+              className="w-32 h-32 md:w-32 md:h-32 rounded-lg transition-transform duration-500 hover:scale-110 hover:rotate-12 " style={{zIndex:11}}
             />
           </div>
 

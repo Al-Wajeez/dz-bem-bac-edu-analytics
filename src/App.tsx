@@ -54,7 +54,7 @@ export default function App() {
       setData(storedData);
       const allColumns = Object.keys(storedData[0]).filter(key => key !== 'id');
       setColumns(allColumns);
-      setVisibleColumns(allColumns.slice(0, 5)); // Only the first four columns are visible by default
+      setVisibleColumns(allColumns.filter((_, index) => [0, 1, 2, 3, 5].includes(index))); // Only the first four columns are visible by default
     } else {
       setData([]);
       setColumns([]);
@@ -160,6 +160,7 @@ export default function App() {
             let lastTwoDigits = '';
             let strdirectorate = '';
             let strschoolName = '';
+            let strschoolTrunk ='';
             const jsonData = [];
 
             // Process the data
@@ -171,7 +172,7 @@ export default function App() {
         if (!cellB || !cellB.v) continue;
         
         // Get data from columns B to the last column
-                for (let C = 1; C <= 4; C++) {
+        for (let C = 1; C <= 4; C++) {
           const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
           const header = worksheet[XLSX.utils.encode_cell({ r: 5, c: C })]; // Headers from row 6
           if (cell && typeof cell.v === 'number' && header.v === 'تاريخ الميلاد') {
@@ -181,31 +182,41 @@ export default function App() {
             row[header.v] = cell ? cell.v : '';
           }
         }
-  
-        // Add the last two digits from cell A5 to each row if A5 has a value
-                const cellA5 = worksheet[XLSX.utils.encode_cell({ r: 4, c: 0 })]; // A5
-                if (cellA5 && cellA5.v) {
-                    lastTwoDigits = String(cellA5.v).slice(-2);
-                    row['القسم'] = 'السنة الرابعة م ' + lastTwoDigits;
-                } else {
-                    row['القسم'] = '';
-                }
 
-                // Get values from A3 and A4
-                const cellA3 = worksheet[XLSX.utils.encode_cell({ r: 2, c: 0 })]; // A3
-                if (cellA3 && cellA3.v) {
-                    strdirectorate = String(cellA3.v);
-                    row['المديرية'] = strdirectorate;
-                } else {
-                    row['المديرية'] = '';
-                }
+        // Determine the section based on the school name
 
-                const cellA4 = worksheet[XLSX.utils.encode_cell({ r: 3, c: 0 })]; // A4
-                if (cellA4 && cellA4.v) {
-                    strschoolName = String(cellA4.v);
-                    row['المؤسسة'] = strschoolName;
+        const cellA4 = worksheet[XLSX.utils.encode_cell({ r: 3, c: 0 })]; // A4
+        if (cellA4 && cellA4.v) {
+            strschoolName = String(cellA4.v);
+            row['المؤسسة'] = strschoolName;
         } else {
-                    row['المؤسسة'] = '';
+            row['المؤسسة'] = '';
+        }
+
+        const cellA5 = worksheet[XLSX.utils.encode_cell({ r: 4, c: 0 })]; // A5
+        const strschoolTrunk = String(cellA5.v).match(/جدع مشترك (آداب|علوم)/);
+
+        
+        if (cellA5 && cellA5.v) {
+            lastTwoDigits = String(cellA5.v).slice(-2);
+            if (strschoolName.startsWith('متوسطة')) {
+                row['القسم'] = 'السنة الرابعة م ' + lastTwoDigits;
+            } else if (strschoolName.startsWith('ثانوية')) {
+                row['القسم'] = strschoolTrunk ? 'جذع مشترك ' + strschoolTrunk[1]  + ' ' + lastTwoDigits : '';
+            } else {
+                row['القسم'] = '';
+            }
+        } else {
+            row['القسم'] = '';
+        }
+
+        // Get values from A3 and A4
+        const cellA3 = worksheet[XLSX.utils.encode_cell({ r: 2, c: 0 })]; // A3
+        if (cellA3 && cellA3.v) {
+            strdirectorate = String(cellA3.v);
+            row['المديرية'] = strdirectorate;
+        } else {
+            row['المديرية'] = '';
         }
   
         jsonData.push(row);
@@ -604,7 +615,7 @@ export default function App() {
                 <div className="relative">
                   <button 
                         onClick={() => setOpenDropdown(openDropdown === 'columnMenu' ? null : 'columnMenu')}
-                        disabled={data.length === 0}
+                        disabled={data.length === 7}
                         className={`inline-flex items-center px-3 py-1.5 mr-2 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 ${isDarkMode ? 'button-dark text-gray-50 hover:bg-gray-900' : 'button-light'}`}
                   >
                     الأعمدة
@@ -619,7 +630,7 @@ export default function App() {
                             checked={visibleColumns.includes(column)}
                             onChange={() => toggleColumn(column)}
                             className="ml-2"
-                            disabled={index < 5}
+                            disabled={index < 1}
                           />
                           {column}
                         </label>
