@@ -52,7 +52,7 @@ export function AnalysisPage({ data, isDarkMode }: AnalysisPageProps) {
   };
 
   const filerFields = {
-    '': ['الجنس','الإعادة','السوابق الصحية','هل الأب متوفي','هل الأم متوفية','الجذع المشترك المرغوب','هل تعاني من صعوبات دراسية','هل لديك مشكل للمناقشة']
+    '': ['الجنس','الإعادة','السوابق الصحية','هل الأب متوفي','هل الأم متوفية','الجذع المشترك المرغوب','هل يعاني من صعوبات دراسية','هل لديه مشكلة يريد مناقشتها']
   }
 
   const calculateStats = (field: string) => {
@@ -934,8 +934,8 @@ export function AnalysisPage({ data, isDarkMode }: AnalysisPageProps) {
 
                   {/* Row 2 */}
                   {fields.slice(3, 5).map((field) => (
-                    <div key={field} className="mb-2">
-                      <label className="block text-sm font-medium text-gray-700">{field}</label>
+                    <div key={field} className={`mb-2 ${isDarkMode ? 'nav-dark' : ''}`}>
+                      <label className={`block text-sm font-medium text-gray-700 ${isDarkMode ? 'columnMenu-dark' : ''}`}>{field}</label>
                       {renderSelect(field, Array.from(
                         new Set(
                           data
@@ -960,8 +960,8 @@ export function AnalysisPage({ data, isDarkMode }: AnalysisPageProps) {
 
                   {/* Row 3 */}
                   {fields.slice(5, 6).map((field) => (
-                    <div key={field} className="mb-2 col-span-2">
-                      <label className="block text-sm font-medium text-gray-700">{field}</label>
+                    <div key={field} className={`mb-2 ${isDarkMode ? 'nav-dark' : ''}`}>
+                      <label className={`block text-sm font-medium text-gray-700 ${isDarkMode ? 'columnMenu-dark' : ''}`}>{field}</label>
                       {renderSelect(field, Array.from(
                         new Set(
                           data
@@ -986,8 +986,8 @@ export function AnalysisPage({ data, isDarkMode }: AnalysisPageProps) {
 
                   {/* Row 4 */}
                   {fields.slice(6, 8).map((field) => (
-                    <div key={field} className="mb-2">
-                      <label className="block text-sm font-medium text-gray-700">{field}</label>
+                    <div key={field} className={`mb-2 ${isDarkMode ? 'nav-dark' : ''}`}>
+                      <label className={`block text-sm font-medium text-gray-700 ${isDarkMode ? 'columnMenu-dark' : ''}`}>{field}</label>
                       {renderSelect(field, Array.from(
                         new Set(
                           data
