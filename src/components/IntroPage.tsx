@@ -1,17 +1,21 @@
 import React from 'react';
 import { TabletSmartphone, ExternalLink, QrCode } from 'lucide-react';
-import favicon from '../images/favicon.png'; // Import the image
-import dashboard from '../images/dashboard.png'; // Import the image
-import telegram from '../images/telegram.png'; // Import the image
-import { TrueFocus } from "../components/ui/true-focus"; // Import the TrueFocus component
+import favicon from './../images/favicon.png';
+import telegram from './../images/telegram.png';
+import { TextRotate } from "./ui/text-rotate";
+import { LayoutGroup, motion } from "framer-motion"
 import { HighlighterItem, HighlightGroup, Particles } from "../components/ui/highlighter"; // Import the Highlighter components
 import { useAnimate } from "framer-motion";
+import { useNavigate } from 'react-router-dom';
+import { EmbeddedVideo } from "./ui/EmbeddedVideo";
+import { OwnerProfile } from "./ui/OwnerProfile";
+import { SiteOffers } from "./ui/SiteOffers";
+import Testimonials from "./ui/Testimonials";
+import { References } from "./ui/References";
 
-interface IntroPageProps {
-  setShowIntro: (show: boolean) => void;
-}
+const IntroPage: React.FC = () => {
 
-const IntroPage: React.FC<IntroPageProps> = ({ setShowIntro }) => {
+  const navigate = useNavigate();
 
   const [scope, animate] = useAnimate();
 
@@ -96,7 +100,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ setShowIntro }) => {
         <div className="container mx-auto px-12 py-2 flex flex-col items-center">
           <a href="/">
             <div className="inline-flex items-center rounded-full border px-2.5 py-2 mb-4 text-xs transition-colors focus:outline-green focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-200">
-              <span className="text-green-800">أخر تحديث 25 مارس 2025 - 🎉 إضافة التحليل الشامل</span>
+              <span className="text-green-800">أخر تحديث 01 جويلية 2025 - 🎉 إضافة مقارنة النتائج</span>
             </div>
           </a>
 
@@ -106,7 +110,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ setShowIntro }) => {
             <img
               src={favicon} // Use the imported image
               alt="Al Wajeez Logo"
-              className="w-32 h-32 md:w-32 md:h-32 rounded-lg transition-transform duration-500 hover:scale-110 hover:rotate-12 " style={{zIndex:11}}
+              className="w-32 h-32 md:w-32 md:h-32 rounded-lg transition-transform duration-500 hover:scale-110 hover:rotate-12" style={{zIndex:11}}
             />
           </div>
 
@@ -114,55 +118,163 @@ const IntroPage: React.FC<IntroPageProps> = ({ setShowIntro }) => {
           <div className="w-full text-center">
             
             {/* TrueFocus Component */}
-            <div className="container mx-auto px-2 py-2 mb-4">
-              <TrueFocus
-                sentence="استبيان الميول والاهتمامات"
-                manualMode={false}
-                blurAmount={5}
-                borderColor="red"
-                animationDuration={2}
-                pauseBetweenAnimations={1}
-              />
+            <div className="relative flex gap-4 text-6xl font-bold justify-center items-center flex-wrap text-gray-800 bg-gradient-to-r from-gray-800 to-gray-900 bg-clip-text">
+              <LayoutGroup>
+                <motion.p className="flex flex-col xl:flex-row whitespace-pre" layout>
+                  <motion.span
+                      className="pt-0.5 sm:pt-4 md:pt-4 xl:pt-4"
+                      layout
+                      transition={{ type: "spring", damping: 40, stiffness: 500 }}
+                    >
+                      تحليل نتائج شهادة{" "}
+                  </motion.span>
+                  <TextRotate
+                    texts={[
+                      "التعليم المتوسط",
+                      "البكالوريا",
+                    ]}
+                    mainClassName="text-white px-2 bg-gray-800 overflow-hidden py-0.5 sm:py-3.5 md:py-3 sm:px-3 md:px-3.5 lg:px-3.5 sm:mt-6 md:mt-6 xl:mt-2 justify-center rounded-lg"
+                    staggerFrom={"last"}
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    exit={{ y: "-120%" }}
+                    staggerDuration={0.025}
+                    splitLevelClassName="overflow-hidden pb-0.5 sm:pb-3 md:pb-4"
+                    transition={{ type: "spring", damping: 40, stiffness: 500 }}
+                    rotationInterval={2000}
+                  />
+                </motion.p>
+              </LayoutGroup>
             </div>
-            <p className="text-lg sm:text-xl text-gray-800 mb-8">
-              مرحبًا بك في موقع الوجيز لتحليل استبيان الميول والاهتمامات!
+            <p className="text-lg sm:text-xl text-gray-800 mb-8 mt-8">
+              مرحبًا بك في موقع الوجيز، رفيقك الذكي لتحليل نتائج شهادة التعليم المتوسط وشهادة البكالوريا!
+            </p>
+            <p className="text-sm sm:text-sm text-gray-800 mb-8 mt-8">
+              هنا تتحول الأرقام إلى رؤى، وتصبح النتائج حكاية نجاح مشوّقة!
             </p>
             
-            <div className="flex justify-center space-x-4">
+            <div className="flex flex-col md:flex-row justify-center space-x-4">
               <button
-                onClick={() => setShowIntro(false)}
-                className="flex items-center px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-300 ml-4" style={{zIndex:11}}
+                onClick={() => navigate('/tcl')}
+                disabled
+                title="قيد الإنشاء"
+                className="flex items-center px-6 py-3 bg-gray-200 text-gray-600 rounded-lg shadow-md hover:bg-gray-200 transition duration-300 ml-4 mt-2 mb-2 cursor-not-allowed opacity-50" style={{zIndex:11}}
               >
                 <TabletSmartphone className="w-5 h-5 ml-2" />
-                الدخول إلى الموقع
+                شهادة البكالوريا
+                
+            
+              </button>
+
+              <button
+                onClick={() => navigate('/tcs')}
+                className="flex items-center px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-300 ml-4 mt-2 mb-2" style={{zIndex:11}}
+              >
+                <TabletSmartphone className="w-5 h-5 ml-2" />
+                شهادة التعليم المتوسط
               </button>
 
               <button
                 onClick={() => handleRedirect('https://al-wajeez.vercel.app/')} // Replace with your URL
-                className="flex items-center px-6 py-3 bg-gray-600 border border-gray-600 text-white rounded-lg hover:bg-gray-800 transition duration-300" style={{zIndex:11}}
+                className="flex items-center px-6 py-3 bg-gray-600 border border-gray-600 text-white rounded-lg hover:bg-gray-800 transition duration-300 mt-2 mb-2" style={{zIndex:11}}
               >
                 <ExternalLink className="w-5 h-5 ml-2" />
                 الموقع الرسمي
               </button>
             </div>
-            
-            <div className="relative w-full pt-12 px-4 sm:px-6 lg:px-8">
-              <div className="flex relative z-10 overflow-hidden border rounded-md shadow-[0_0_50px_-12px_rgba(0,0,0,0.3)] dark:shadow-[0_0_50px_-12px_rgba(255,255,255,0.1)] border-brand/10 dark:border-brand/5">
-                <img
-                  alt="Al Wajeez Platform Dashboard"
-                  width="1248"
-                  height="765"
-                  className="w-full h-auto transition-transform duration-300 hover:scale-104"
-                  loading="lazy"
-                  decoding="async"
-                  src={dashboard}
-                />
-              </div>
-            </div>
+          
           </div>
         </div>
         
       </main>
+
+      {/* New Sections Start */}
+      <div className="space-y-16 mt-8">
+        {/* Embedded YouTube Video Section */}
+        <EmbeddedVideo />
+        {/* Site Owner Profile Section */}
+        <OwnerProfile />
+        {/* What the Site Offers Section */}
+        <motion.div className="items-center justify-center max-w-5xl mx-auto">
+          <div className="top-0 left-0">
+            <motion.h2 className="text-3xl text-gray-800 font-bold mb-6 text-center">خدمات تحليلية متكاملة في متناول يدك</motion.h2>
+            <motion.p className='text-ms text-gray-800 max-lg:px-8 mb-6 text-center'>موقعنا يقدم لك تحليلًا دقيقًا للنتائج مع إمكانية مقارنة البيانات عبر رسوم بيانية احترافية. احصل على تقارير بيداغوجية تساعدك على فهم أعمق للأداء، كل ذلك في واجهة تفاعلية سهلة الاستخدام. والأفضل من ذلك، خدماتنا مجانية تمامًا، مع دقة عالية وتحليل يتم في ثوانٍ معدودة.</motion.p>
+            <SiteOffers />
+          </div>
+        </motion.div>
+        {/* Testimonials Section */}
+        <Testimonials />
+        {/* References Section */}
+        <section className="my-24 px-4 md:px-10">
+          <div className="flex flex-col items-center justify-center max-w-5xl mx-auto"  style={{zIndex:11}}>
+            <h2 className="text-3xl text-gray-800 font-bold mb-6 text-center">المراجع والمصادر</h2>
+            <p className="text-ms text-gray-800 mb-6 text-center">تم تطوير هذا الموقع استناداً إلى المراجع والمقررات وكذا المناشير الرسمية الصادرة عن وزارة التربية والتعليم الوطني، بهدف توفير محتوى تعليمي موثوق يتماشى مع التوجيهات والمناهج المعتمدة.</p>
+            <References
+              title="المنشور الوزاري | 1474"
+              description="المؤرخ في 14 سبتمبر 2021 بخصوص ترتيبات إعادة إدماج التلاميذ."
+              variant="plus" // or "gradient", "plus", etc.
+              className="max-w-[1000px] bg-white mb-4 mb-4"
+            />
+
+            <References
+              title="المنشور الوزاري | 192"
+              description="المؤرخ في 09 جويلية 2007 المتضمن دراسة نتائج الامتحانات الرسمية في النظام التربوي."
+              variant="plus" // or "gradient", "plus", etc.
+              className="max-w-[1000px] bg-white mb-4"
+            />
+
+            <References
+              title="المنشور الوزاري | 618"
+              description="المؤرخ في 18 أفريل 2022 بخصوص استحداث شعبة فنون في مرحلة التعليم الثانوي العام."
+              variant="plus" // or "gradient", "plus", etc.
+              className="max-w-[1000px] bg-white mb-4"
+            />
+
+            <References
+              title="المنشور الوزاري | 48"
+              description="المؤرخ في 13 فبراير 2008 خاص بتوجيه تلاميذ الاولى ثانوي الى شعب الثانية ثانوي."
+              variant="plus" // or "gradient", "plus", etc.
+              className="max-w-[1000px] bg-white mb-4"
+            />
+
+            <References
+              title="المنشور الوزاري | 49"
+              description="المؤرخ في 15 فيفري 2008 خاص بتوجيه تلاميذ الرابعة متوسط الى الجذعين المشتركين."
+              variant="plus" // or "gradient", "plus", etc.
+              className="max-w-[1000px] bg-white mb-4"
+            />
+
+            <References
+              title="القرار الوزاري | 37"
+              description="المؤرخ في 14 أفريل 2022 بخصوص تحديد شعب التعليم الثانوي العام والتكنولوجي."
+              variant="plus" // or "gradient", "plus", etc.
+              className="max-w-[1000px] bg-white mb-4"
+            />
+
+            <References
+              title="القرار الوزاري | 827"
+              description="الذي يحدد مهام المستشارين والمستشارين الرئيسيين في التوجيه المدرسي والمهني ونشاطاتهم في المؤسسات التعليمية."
+              variant="plus" // or "gradient", "plus", etc.
+              className="max-w-[1000px] bg-white mb-4"
+            />
+
+            <References
+              title="المادة | 12"
+              description="من القانون التوجيهي للتربية الوطنية رقم 08-04 المؤرخ في 23 جانفي 2008."
+              variant="plus" // or "gradient", "plus", etc.
+              className="max-w-[1000px] bg-white mb-4"
+            />
+
+            <References
+              title="موقع"
+              description="وزارة التربية الوطنية. | https://www.education.gov.dz"
+              variant="plus" // or "gradient", "plus", etc.
+              className="max-w-[1000px] bg-white mb-4"
+            />  
+          </div>
+        </section>
+      </div>
+      {/* New Sections End */}
 
       {/* Footer Section */}
       <footer className="py-10 px-4 text-center">
