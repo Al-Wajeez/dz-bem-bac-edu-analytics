@@ -6,13 +6,14 @@ import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   return (
-
+    <>
       <Routes>
         <Route path="/" element={<IntroPage />} />
         <Route path="/tcl" element={<DashboardTCL />} />
         <Route path="/tcs" element={<DashboardTCS />} />
       </Routes>
-
+      <Analytics />
+    </>
   );
 }
 
