@@ -22,8 +22,6 @@ import GradeDistributionPrintableAnalysis from './printanalysis/GradeDistributio
 import CategoryDistributionPrintableAnalysis from './printanalysis/CategoryStats';
 import HarmonyPrintableAnalysis from './printanalysis/HarmonyStats';
 import DetailedGradePrintableAnalysis from './printanalysis/DetailedGradeDistribution';
-import RepeatDifferencePrintableAnalysis from './printanalysis/RepeatDifference';
-import GenderDifferencePrintableAnalysis from './printanalysis/GenderDifference';
 import SubjectPassPrintableAnalysis from './printanalysis/SubjectPass';
 import GeneralDepartmentPerformanceAnalysis from './printanalysis/DepartmentStats';
 import SchoolPerformancePrintableAnalysis from './printanalysis/SchoolStats';
@@ -32,26 +30,20 @@ import MeritPerformancePrintableAnalysis from './printanalysis/MeritStats';
 import FailingStudentsPrintableAnalysis from './printanalysis/LowestFailing';
 import TopStudentsPrintableAnalysis from './printanalysis/TopStudents';
 
-// Chats
-import SubjectStatsChart from './charts/SubjectStatsChart';
-import GradeDistributionChart from './charts/GradeDistributionChart';
-import CategoryStatsChart from './charts/CategoryStatsChart';
-import HarmonyStatsChart from './charts/HarmonyStatsChart';
-import DetailedGradeDistributionChart from './charts/DetailedGradeDistributionChart';
-import RepeatDifferenceChart from './charts/RepeatDifferenceChart';
-import GenderDifferenceChart from './charts/GenderDifferenceChart';
-import SubjectPassChart from './charts/SubjectPassChart';
-import DepartmentStatsChart from './charts/DepartmentStatsChart';
-import SchoolStatsChart from './charts/SchoolStatsChart';
-import DirectoratePerformanceStatsChart from './charts/DirectoratePerformanceStatsChart';
-import MeritChart from './charts/MeritStatsChart';
+// Charts
+import SubjectStatsChart from './charts/DiffChart/SubjectStatsChart';
+import GradeDistributionChart from './charts/DiffChart/GradeDistributionChart';
+import SubjectPassChart from './charts/DiffChart/SubjectPassChart';
+import DetailedGradeDistributionChart from './charts/DiffChart/DetailedGradeDistributionChart';
+import HarmonyStatsChart from './charts/DiffChart/HarmonyStatsChart';
+import CategoryStatsChart from './charts/DiffChart/CategoryStatsChart';
+import MeritChart from './charts/DiffChart/MeritStatsChart';
+
 
 // Qualitative Analysis
 import SubjectStatsQualitativeAnalysis from './QualitativeAnalysis/SubjectStatsQualitativeAnalysis';
 import GradeDistributionQualitativeAnalysis from './QualitativeAnalysis/GradeDistributionQualitativeAnalysis';
 import SubjectPassQualitativeAnalysis from './QualitativeAnalysis/SubjectPassQualitativeAnalysis';
-import GenderDifferenceQualitativeAnalysis from './QualitativeAnalysis/GenderDifferenceQualitativeAnalysis';
-import RepeatDifferenceQualitativeAnalysis from './QualitativeAnalysis/RepeatDifferenceQualitativeAnalysis';
 import DetailedGradeDistributionQualitativeAnalysis from './QualitativeAnalysis/DetailedGradeDistributionQualitativeAnalysis';
 import HarmonyStatsQualitativeAnalysis from './QualitativeAnalysis/HarmonyStatsQualitativeAnalysis';
 import CategoryStatsQualitativeAnalysis from './QualitativeAnalysis/CategoryStatsQualitativeAnalysis';
@@ -731,6 +723,15 @@ interface SubjectStats {
   variance: number;
   remark: string;
   remarkType: RemarkType;
+  fieldA: string;
+  fieldB: string;
+  meanA: string;
+  stdDevA: string;
+  meanB: string;
+  stdDevB: string;
+  difference: string;
+  tTest: string;
+  hasData: boolean;
 }
 
 
@@ -950,166 +951,6 @@ const calculateMedian = (grades: number[]): number => {
   }
 };
 
-const calculateGenderDifferences = (data: Student[]): GenderDifferenceStats[] => {
-  const subjects = [
-    'اللغة العربية م س', 'اللغة الأمازيغية م س', 'اللغة الفرنسية م س', 'اللغة الإنجليزية م س', 'التربية الإسلامية م س',
-    'التربية المدنية م س', 'التاريخ والجغرافيا م س', 'الرياضيات م س', 'ع الطبيعة و الحياة م س', 'ع الفيزيائية والتكنولوجيا م س', 'المعلوماتية م س',
-    'التربية التشكيلية م س', 'التربية الموسيقية م س', 'ت البدنية و الرياضية م س', 'المعدل السنوي', 'معدل ش ت م'
-  ];
-
-  return subjects.map(subject => {
-    const maleGrades = data
-      .filter(student => student['الجنس'] === 'ذكر' && student[subject] >= 0.01)
-      .map(student => student[subject]);
-
-    const femaleGrades = data
-      .filter(student => student['الجنس'] === 'أنثى' && student[subject] >= 0.01)
-      .map(student => student[subject]);
-
-    const n1 = maleGrades.length;
-    const n2 = femaleGrades.length;
-
-    // ➤ إذا لم توجد بيانات كافية للمقارنة
-    if (n1 === 0 || n2 === 0) {
-      return {
-        subject,
-        maleMean: 0,
-        femaleMean: 0,
-        maleStdDev: 0,
-        femaleStdDev: 0,
-        difference: 0,
-        tTest: 0,
-        significance: 'not-applicable',
-        remark: 'لا تُدرّس',
-        remarkType: 'secondary'
-      };
-    }
-
-    const maleMean = calculateMean(maleGrades);
-    const femaleMean = calculateMean(femaleGrades);
-    const maleStdDev = calculateStdDev(maleGrades, maleMean);
-    const femaleStdDev = calculateStdDev(femaleGrades, femaleMean);
-
-    const denominator = Math.sqrt((maleStdDev ** 2 / n1) + (femaleStdDev ** 2 / n2));
-    let tTest = 0;
-    if (denominator !== 0) {
-      tTest = Math.abs((maleMean - femaleMean) / denominator);
-    }
-
-    const difference = Math.abs(maleMean - femaleMean);
-    const significance = tTest > 1.96 ? 'significant' : 'not-significant';
-
-    let remark = '';
-    let remarkType: RemarkType = 'secondary';
-
-    if (significance === 'significant') {
-      if (maleMean > femaleMean) {
-        remark = 'تفوق الذكور بشكل ملحوظ';
-        remarkType = 'info';
-      } else {
-        remark = 'تفوق الإناث بشكل ملحوظ';
-        remarkType = 'success';
-      }
-    } else {
-      remark = 'لا يوجد فرق ذو دلالة إحصائية';
-      remarkType = 'secondary';
-    }
-
-    return {
-      subject,
-      maleMean: Number(maleMean.toFixed(2)),
-      femaleMean: Number(femaleMean.toFixed(2)),
-      maleStdDev: Number(maleStdDev.toFixed(2)),
-      femaleStdDev: Number(femaleStdDev.toFixed(2)),
-      difference: Number(difference.toFixed(2)),
-      tTest: Number(tTest.toFixed(2)),
-      significance,
-      remark,
-      remarkType
-    };
-  });
-};
-
-const calculateRepeatDifferences = (data: Student[]): RepeatDifferenceStats[] => {
-  const subjects = [
-    'اللغة العربية م س', 'اللغة الأمازيغية م س', 'اللغة الفرنسية م س', 'اللغة الإنجليزية م س', 'التربية الإسلامية م س',
-    'التربية المدنية م س', 'التاريخ والجغرافيا م س', 'الرياضيات م س', 'ع الطبيعة و الحياة م س', 'ع الفيزيائية والتكنولوجيا م س', 'المعلوماتية م س',
-    'التربية التشكيلية م س', 'التربية الموسيقية م س', 'ت البدنية و الرياضية م س', 'المعدل السنوي', 'معدل ش ت م'
-  ];
-
-  return subjects.map(subject => {
-    const repeatGrades = data
-      .filter(student => student['الإعادة'] === 'نعم' && student[subject] >= 0.01)
-      .map(student => student[subject]);
-    
-    const nonRepeatGrades = data
-      .filter(student => student['الإعادة'] === 'لا' && student[subject] >= 0.01)
-      .map(student => student[subject]);
-
-    const n1 = repeatGrades.length;
-    const n2 = nonRepeatGrades.length;
-
-    // ➤ في حالة عدم وجود بيانات للمعيدين أو غير المعيدين
-    if (n1 === 0 || n2 === 0) {
-      return {
-        subject,
-        repeatMean: 0,
-        nonRepeatMean: 0,
-        repeatStdDev: 0,
-        nonRepeatStdDev: 0,
-        difference: 0,
-        tTest: 0,
-        significance: 'not-applicable',
-        remark: 'لا تُدرّس',
-        remarkType: 'secondary'
-      };
-    }
-
-    const repeatMean = calculateMean(repeatGrades);
-    const nonRepeatMean = calculateMean(nonRepeatGrades);
-    const repeatStdDev = calculateStdDev(repeatGrades, repeatMean);
-    const nonRepeatStdDev = calculateStdDev(nonRepeatGrades, nonRepeatMean);
-
-    let tTest = 0;
-    const denominator = Math.sqrt((repeatStdDev ** 2 / n1) + (nonRepeatStdDev ** 2 / n2));
-    if (denominator !== 0) {
-      tTest = Math.abs((repeatMean - nonRepeatMean) / denominator);
-    }
-
-    const significance = tTest > 1.96 ? 'significant' : 'not-significant';
-    const difference = Math.abs(repeatMean - nonRepeatMean);
-
-    let remark = '';
-    let remarkType: RemarkType = 'secondary';
-
-    if (significance === 'significant') {
-      if (repeatMean > nonRepeatMean) {
-        remark = 'تفوق المعيدين بشكل ملحوظ';
-        remarkType = 'info';
-      } else {
-        remark = 'تفوق غير المعيدين بشكل ملحوظ';
-        remarkType = 'info';
-      }
-    } else {
-      remark = 'لا يوجد فرق ذو دلالة إحصائية';
-      remarkType = 'secondary';
-    }
-
-    return {
-      subject,
-      repeatMean: Number(repeatMean.toFixed(2)),
-      nonRepeatMean: Number(nonRepeatMean.toFixed(2)),
-      repeatStdDev: Number(repeatStdDev.toFixed(2)),
-      nonRepeatStdDev: Number(nonRepeatStdDev.toFixed(2)),
-      difference: Number(difference.toFixed(2)),
-      tTest: Number(tTest.toFixed(2)),
-      significance,
-      remark,
-      remarkType
-    };
-  });
-};
-
 //#endregion
 
 const certificateSubjectMap: Record<string, string> = {
@@ -1255,6 +1096,7 @@ const SubjectStatsTable: React.FC<SubjectStatsTableDiffrenceProps> = ({ data, te
   const baseSubjects = getAllBaseSubjects();
 
   const stats = useMemo(() => {
+
     return baseSubjects.map(baseSubject => {
       const fieldA = getSubjectField(baseSubject, termA);
       const fieldB = getSubjectField(baseSubject, termB);
@@ -1334,18 +1176,17 @@ const SubjectStatsTable: React.FC<SubjectStatsTableDiffrenceProps> = ({ data, te
             <NotebookPen className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowChart(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
-            disabled
+            className="p-2 text-orange-600 hover:text-orange-800"
             title="عرض الرسم البياني"
           >
             <BarChart2 className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => printTable('subjectStatsTable', 'subjectStatsDiffTitle')}
             className="p-2 text-orange-600 hover:text-orange-800"
             title="طباعة الجدول"
@@ -1406,7 +1247,20 @@ const SubjectStatsTable: React.FC<SubjectStatsTableDiffrenceProps> = ({ data, te
           </tbody>
         </table>
       </div>
-      
+      {showChart && (
+        <SubjectStatsChart
+          data={stats.map(row => ({
+            subject: row.subject,
+            meanA: parseFloat(row.meanA),
+            meanB: parseFloat(row.meanB),
+          }))}
+          title={`مقارنة المتوسطات بين ${termA} و ${termB}`}
+          termA={termA}
+          termB={termB}
+          isDarkMode={isDarkMode}
+          onClose={() => setShowChart(false)}
+        />
+      )}
     </div>
   );
 };
@@ -1530,8 +1384,8 @@ const GradeDistributionTable: React.FC<GradeDistributionTableDiffrenceProps> = (
         </h2>
         <div className="flex gap-2">
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowAnalysis(true)}
             className="p-2 text-gray-300 cursor-not-allowed opacity-50"
             disabled
@@ -1540,18 +1394,17 @@ const GradeDistributionTable: React.FC<GradeDistributionTableDiffrenceProps> = (
             <NotebookPen className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowChart(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
-            disabled
+            className="p-2 text-orange-600 hover:text-orange-800"
             title="عرض الرسم البياني"
           >
             <BarChart2 className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handlePrint}
             className="p-2 text-orange-600 hover:text-orange-800"
             title="طباعة الجدول"
@@ -1736,6 +1589,26 @@ const GradeDistributionTable: React.FC<GradeDistributionTableDiffrenceProps> = (
       </div>
 
       {/* Analysis and Chart components would go here */}
+      {showChart && (
+        <GradeDistributionChart
+          data={
+            (activeTab === 'above10' ? above10Distribution :
+            activeTab === 'between8And10' ? between8And10Distribution :
+            below8Distribution
+            ).map(({ subject, termAPercentage, termBPercentage }) => ({
+              subject,
+              termAPercentage,
+              termBPercentage,
+            }))
+          }
+          termA={termA}
+          termB={termB}
+          title={`مقارنة النسب في ${activeTab === 'above10' ? 'الدرجات ≥ 10' : activeTab === 'between8And10' ? 'الدرجات 8 - 9.99' : 'الدرجات < 8'}`}
+          isDarkMode={isDarkMode}
+          onClose={() => setShowChart(false)}
+        />
+      )}
+
     </div>
   );
 };
@@ -1827,8 +1700,8 @@ const SubjectPassTable: React.FC<SubjectPassTableDiffrenceProps> = ({ data, term
         </h2>
         <div className="flex gap-2">
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowAnalysis(true)}
             className="p-2 text-gray-300 cursor-not-allowed opacity-50"
             disabled
@@ -1837,18 +1710,17 @@ const SubjectPassTable: React.FC<SubjectPassTableDiffrenceProps> = ({ data, term
             <NotebookPen className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowChart(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
-            disabled
+            className="p-2 text-orange-600 hover:text-orange-800"
             title="عرض الرسم البياني"
           >
             <BarChart2 className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => printTable('subjectPassDiffTable', 'subjectPassDiffTitle')}
             className="p-2 text-orange-600 hover:text-orange-800"
             title="طباعة الجدول"
@@ -1856,8 +1728,8 @@ const SubjectPassTable: React.FC<SubjectPassTableDiffrenceProps> = ({ data, term
             <Printer className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => exportToExcel('subjectPassDiffTable')}
             className="p-2 text-green-600 hover:text-green-800"
             title="تصدير إلى ملف إكسل"
@@ -1908,29 +1780,41 @@ const SubjectPassTable: React.FC<SubjectPassTableDiffrenceProps> = ({ data, term
           </tbody>
         </table>
       </div>
+      {showChart && (
+        <SubjectPassChart
+          data={stats.map(row => ({
+            subject: row.subject,
+            passPercentageA: (row.passPercentageA),
+            passPercentageB: (row.passPercentageB),
+          }))}
+          title={`مقارنة المتوسطات بين ${termA} و ${termB}`}
+          termA={termA}
+          termB={termB}
+          isDarkMode={isDarkMode}
+          onClose={() => setShowChart(false)}
+        />
+      )}
     </div>
   );
 };
 //--------------------------------------------------------------------------
 // ✅ Gender Stats Table Diffrence
 interface GenderStatsTableDiffrenceProps {
-  stats: GenderStats
   data: Student[];
+  termA: string;
+  termB: string;
   isDarkMode: boolean;
 }
-const GenderStatsTable: React.FC<GenderStatsTableDiffrenceProps> = ({ isDarkMode, data }) => {
+const GenderStatsTable: React.FC<GenderStatsTableDiffrenceProps> = ({ termA, termB, isDarkMode, data }) => {
   const [activeTab, setActiveTab] = useState<'male' | 'female'>('male');
-  const [showChart, setShowChart] = useState<boolean>(false);
-  const [showAnalysis, setShowAnalysis] = useState<boolean>(false);
 
   return (
     <div className={`mb-8 bg-white rounded-lg shadow p-6 ${isDarkMode ? 'dark-mode' : ''}`}>
-
       <div className="w-full max-w-3xl mx-auto">
         <nav className="flex w-full border-b border-gray-200">
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('male')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'male'
@@ -1941,8 +1825,8 @@ const GenderStatsTable: React.FC<GenderStatsTableDiffrenceProps> = ({ isDarkMode
             الذكور
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('female')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'female'
@@ -1956,10 +1840,10 @@ const GenderStatsTable: React.FC<GenderStatsTableDiffrenceProps> = ({ isDarkMode
       </div>
       <div className="mt-4">
         <div className={activeTab === 'male' ? '' : 'hidden'}>
-          <SubjectStatsTable data={data} termA='الفصل الأول' termB='الفصل الثاني' isDarkMode={isDarkMode} />
+          <SubjectStatsTable data={data.filter(s => s['الجنس'] === 'ذكر')} termA={termA} termB={termB} isDarkMode={isDarkMode} />
         </div>
         <div className={activeTab === 'female' ? '' : 'hidden'}>
-          <SubjectStatsTable data={data} termA='الفصل الأول' termB='الفصل الثاني' isDarkMode={isDarkMode} />
+          <SubjectStatsTable data={data.filter(s => s['الجنس'] === 'أنثى')} termA={termA} termB={termB} isDarkMode={isDarkMode} />
         </div>
       </div>
     </div>
@@ -1968,22 +1852,21 @@ const GenderStatsTable: React.FC<GenderStatsTableDiffrenceProps> = ({ isDarkMode
 //--------------------------------------------------------------------------
 // ✅ Repeat Stats Table Diffrence
 interface RepeatStatsTableDiffrenceProps {
-  stats: RepeatStats
   data: Student[];
+  termA: string;
+  termB: string;
   isDarkMode: boolean;
 }
-const RepeatStatsTable: React.FC<RepeatStatsTableDiffrenceProps> = ({ isDarkMode, data }) => {
+const RepeatStatsTable: React.FC<RepeatStatsTableDiffrenceProps> = ({ termA, termB, isDarkMode, data }) => {
   const [activeTab, setActiveTab] = useState<'repeat' | 'nonRepeat'>('repeat');
-  const [showChart, setShowChart] = useState<boolean>(false);
-  const [showAnalysis, setShowAnalysis] = useState<boolean>(false);
 
   return (
     <div className={`mb-8 bg-white rounded-lg shadow p-6 ${isDarkMode ? 'dark-mode' : ''}`}>
       <div className="w-full max-w-3xl mx-auto">
         <nav className="flex w-full border-b border-gray-200">
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('repeat')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'repeat'
@@ -1994,8 +1877,8 @@ const RepeatStatsTable: React.FC<RepeatStatsTableDiffrenceProps> = ({ isDarkMode
             المعيدين
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('nonRepeat')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'nonRepeat'
@@ -2010,10 +1893,10 @@ const RepeatStatsTable: React.FC<RepeatStatsTableDiffrenceProps> = ({ isDarkMode
 
       <div className="mt-4">
         <div className={activeTab === 'repeat' ? '' : 'hidden'}>
-          <SubjectStatsTable data={data} termA='الفصل الأول' termB='الفصل الثاني' isDarkMode={isDarkMode} />
+          <SubjectStatsTable data={data.filter(s => s['الإعادة'] === 'نعم')} termA={termA} termB={termB} isDarkMode={isDarkMode} />
         </div>
         <div className={activeTab === 'nonRepeat' ? '' : 'hidden'}>
-          <SubjectStatsTable data={data} termA='الفصل الأول' termB='الفصل الثاني' isDarkMode={isDarkMode} />
+          <SubjectStatsTable data={data.filter(s => s['الإعادة'] === 'لا')} termA={termA} termB={termB} isDarkMode={isDarkMode} />
         </div>
       </div>
     </div>
@@ -2207,8 +2090,8 @@ const DetailedGradeDistributionTable: React.FC<DetailedGradeDistributionTableDif
         </h2>
         <div className="flex gap-2">
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowAnalysis(true)}
             className="p-2 text-gray-300 cursor-not-allowed opacity-50"
             disabled
@@ -2217,18 +2100,17 @@ const DetailedGradeDistributionTable: React.FC<DetailedGradeDistributionTableDif
             <NotebookPen className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowChart(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
-            disabled
+            className="p-2 text-orange-600 hover:text-orange-800"
             title="عرض الرسم البياني"
           >
             <BarChart2 className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handlePrint}
             className="p-2 text-orange-600 hover:text-orange-800"
             title="طباعة الجدول"
@@ -2236,8 +2118,8 @@ const DetailedGradeDistributionTable: React.FC<DetailedGradeDistributionTableDif
             <Printer className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => exportToExcel('detailedGradeDistributionDiffTable')}
             className="p-2 text-green-600 hover:text-green-800"
             title="تصدير إلى ملف إكسل"
@@ -2251,8 +2133,8 @@ const DetailedGradeDistributionTable: React.FC<DetailedGradeDistributionTableDif
       <div className="w-full max-w mx-auto">
         <nav className="flex w-full border-b border-gray-200">
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('range0To8')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'range0To8'
@@ -2263,8 +2145,8 @@ const DetailedGradeDistributionTable: React.FC<DetailedGradeDistributionTableDif
             أقل من 8
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('range9To9')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'range9To9'
@@ -2275,8 +2157,8 @@ const DetailedGradeDistributionTable: React.FC<DetailedGradeDistributionTableDif
             من 9 إلى 9.99
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('range10To11')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'range10To11'
@@ -2287,8 +2169,8 @@ const DetailedGradeDistributionTable: React.FC<DetailedGradeDistributionTableDif
             من 10 إلى 11.99
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('range12To13')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'range12To13'
@@ -2299,8 +2181,8 @@ const DetailedGradeDistributionTable: React.FC<DetailedGradeDistributionTableDif
             من 12 إلى 13.99
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('range14To15')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'range14To15'
@@ -2376,8 +2258,34 @@ const DetailedGradeDistributionTable: React.FC<DetailedGradeDistributionTableDif
           </table>
         </div>
       </div>
-
       {/* Analysis and Chart components would go here */}
+      {showChart && (
+        <DetailedGradeDistributionChart
+          data={
+            (activeTab === 'range0To8' ? range0To8Distribution :
+            activeTab === 'range9To9' ? range9To9Distribution :
+            activeTab === 'range10To11' ? range10To11Distribution :
+            activeTab === 'range12To13' ? range12To13Distribution :
+            activeTab === 'range14To15' ? range14To15Distribution :
+            activeTab === 'range16To17' ? range16To17Distribution : range18To20Distribution
+            ).map(({ subject, termAPercentage, termBPercentage }) => ({
+              subject,
+              termAPercentage,
+              termBPercentage,
+            }))
+          }
+          termA={termA}
+          termB={termB}
+          title={`مقارنة النسب في ${activeTab === 'range0To8' ? 'أقل من 8' : 
+            activeTab === 'range9To9' ? 'من 9 إلى 9.99' : 
+            activeTab === 'range10To11' ? 'من 10 إلى 11.99' : 
+            activeTab === 'range12To13' ? 'من 12 إلى 13.99' : 
+            activeTab === 'range14To15' ? 'من 14 إلى 15.99' : 
+            activeTab === 'range16To17' ?'من 16 إلى 17' : 'أكبر من 18'}`}
+          isDarkMode={isDarkMode}
+          onClose={() => setShowChart(false)}
+        />
+      )}
     </div>
   );
 };
@@ -2466,8 +2374,8 @@ const HarmonyStatsTable: React.FC<HarmonyStatsTableDiffrenceProps> = ({ data, te
         </h2>
         <div className="flex gap-2">
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowAnalysis(true)}
             className="p-2 text-gray-300 cursor-not-allowed opacity-50"
             disabled
@@ -2476,18 +2384,17 @@ const HarmonyStatsTable: React.FC<HarmonyStatsTableDiffrenceProps> = ({ data, te
             <NotebookPen className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowChart(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
-            disabled
+            className="p-2 text-orange-600 hover:text-orange-800"
             title="عرض الرسم البياني"
           >
             <BarChart2 className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => printTable('harmonyStatsDiffTable', 'harmonyStatsDiffTitle')}
             className="p-2 text-orange-600 hover:text-orange-800"
             title="طباعة الجدول"
@@ -2495,8 +2402,8 @@ const HarmonyStatsTable: React.FC<HarmonyStatsTableDiffrenceProps> = ({ data, te
             <Printer className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => exportToExcel('harmonyStatsDiffTable')}
             className="p-2 text-green-600 hover:text-green-800"
             title="تصدير إلى ملف إكسل"
@@ -2539,6 +2446,20 @@ const HarmonyStatsTable: React.FC<HarmonyStatsTableDiffrenceProps> = ({ data, te
           </tbody>
         </table>
       </div>
+      {showChart && (
+        <HarmonyStatsChart
+          data={stats.map(row => ({
+            subject: row.subject,
+            harmonyPercentageA: (row.harmonyRatioA),
+            harmonyPercentageB: (row.harmonyRatioB),
+          }))}
+          title={`مقارنة المتوسطات بين ${termA} و ${termB}`}
+          termA={termA}
+          termB={termB}
+          isDarkMode={isDarkMode}
+          onClose={() => setShowChart(false)}
+        />
+      )}
     </div>
   );
 };
@@ -2731,8 +2652,8 @@ const CategoryStatsTable: React.FC<CategoryStatsTableDiffrenceProps> = ({ data, 
         </h2>
         <div className="flex gap-2">
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowAnalysis(true)}
             className="p-2 text-gray-300 cursor-not-allowed opacity-50"
             disabled
@@ -2741,18 +2662,17 @@ const CategoryStatsTable: React.FC<CategoryStatsTableDiffrenceProps> = ({ data, 
             <NotebookPen className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowChart(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
-            disabled
+            className="p-2 text-orange-600 hover:text-orange-800"
             title="عرض الرسم البياني"
           >
             <BarChart2 className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handlePrint}
             className="p-2 text-orange-600 hover:text-orange-800"
             title="طباعة الجدول"
@@ -2760,8 +2680,8 @@ const CategoryStatsTable: React.FC<CategoryStatsTableDiffrenceProps> = ({ data, 
             <Printer className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => exportToExcel('detailedGradeDistributionDiffTable')}
             className="p-2 text-green-600 hover:text-green-800"
             title="تصدير إلى ملف إكسل"
@@ -2775,8 +2695,8 @@ const CategoryStatsTable: React.FC<CategoryStatsTableDiffrenceProps> = ({ data, 
       <div className="w-full max-w-3xl mx-auto">
         <nav className="flex w-full border-b border-gray-200">
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('weakCategory')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'weakCategory'
@@ -2787,8 +2707,8 @@ const CategoryStatsTable: React.FC<CategoryStatsTableDiffrenceProps> = ({ data, 
             الفئة الضعيفة
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('nearAverageCategory')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'nearAverageCategory'
@@ -2799,8 +2719,8 @@ const CategoryStatsTable: React.FC<CategoryStatsTableDiffrenceProps> = ({ data, 
             الفئة القريبة من المتوسط
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('averageCategory')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'averageCategory'
@@ -2811,8 +2731,8 @@ const CategoryStatsTable: React.FC<CategoryStatsTableDiffrenceProps> = ({ data, 
             الفئة المتوسطة
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('goodCategory')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'goodCategory'
@@ -2823,8 +2743,8 @@ const CategoryStatsTable: React.FC<CategoryStatsTableDiffrenceProps> = ({ data, 
             الفئة الحسنة
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab('excellentCategory')}
             className={`flex-1 text-center py-4 border-b-2 text-sm font-semibold ${
               activeTab === 'excellentCategory'
@@ -2876,8 +2796,30 @@ const CategoryStatsTable: React.FC<CategoryStatsTableDiffrenceProps> = ({ data, 
           </table>
         </div>
       </div>
-
       {/* Analysis and Chart components would go here */}
+      {showChart && (
+        <CategoryStatsChart
+          data={
+            (activeTab === 'weakCategory' ? weakCategoryDistribution :
+            activeTab === 'nearAverageCategory' ? nearAverageCategoryDistribution :
+            activeTab === 'averageCategory' ? averageCategoryDistribution :
+            activeTab === 'goodCategory' ? goodCategoryDistribution : excellentCategoryDistribution
+            ).map(({ subject, termAPercentage, termBPercentage }) => ({
+              subject,
+              termAPercentage,
+              termBPercentage,
+            }))
+          }
+          termA={termA}
+          termB={termB}
+          title={`مقارنة النسب في ${activeTab === 'weakCategory' ? 'الفئة الضعيفة' : 
+            activeTab === 'nearAverageCategory' ? 'الفئة القريبة من المتوسط' : 
+            activeTab === 'averageCategory' ? 'الفئة المتوسطة' : 
+            activeTab === 'goodCategory' ? 'الفئة الحسنة' : 'الفئة الجيدة'}`}
+          isDarkMode={isDarkMode}
+          onClose={() => setShowChart(false)}
+        />
+      )}
     </div>
   );
 };
@@ -2941,10 +2883,10 @@ const MeritTable: React.FC<MeritTableDiffrenceProps> = ({ data, termA, termB, is
     const combinedStats = meritCategories.map((cat, index) => {
       const countA = termAStats[index].count;
       const countB = termBStats[index].count;
-      const percentageA = totalA > 0 ? ((countA / totalA) * 100).toFixed(2) : '0.00';
-      const percentageB = totalB > 0 ? ((countB / totalB) * 100).toFixed(2) : '0.00';
+      const percentageA = totalA > 0 ? ((countA / totalA) * 100) : 0;
+      const percentageB = totalB > 0 ? ((countB / totalB) * 100) : 0;
       const difference = totalA > 0 && totalB > 0 ? 
-        Math.abs(parseFloat(percentageA) - parseFloat(percentageB)).toFixed(2) : '0.00';
+        Math.abs(percentageA - percentageB): 0;
 
       let remark = '';
       let remarkType: RemarkType = 'secondary';
@@ -2979,10 +2921,10 @@ const MeritTable: React.FC<MeritTableDiffrenceProps> = ({ data, termA, termB, is
     combinedStats.push({
       indicator: 'المجموع',
       countA: totalA,
-      percentageA: '100.0',
+      percentageA: 100,
       countB: totalB,
-      percentageB: '100.0',
-      difference: '0.0',
+      percentageB: 100,
+      difference: 0,
       remark: '',
       remarkType: 'secondary'
     });
@@ -2998,8 +2940,8 @@ const MeritTable: React.FC<MeritTableDiffrenceProps> = ({ data, termA, termB, is
         </h2>
         <div className="flex gap-2">
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowAnalysis(true)}
             className="p-2 text-gray-300 cursor-not-allowed opacity-50"
             title="عرض التحليل النوعي"
@@ -3007,17 +2949,17 @@ const MeritTable: React.FC<MeritTableDiffrenceProps> = ({ data, termA, termB, is
             <NotebookPen className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowChart(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
+            className="p-2 text-orange-600 hover:text-orange-800"
             title="عرض الرسم البياني"
           >
             <BarChart className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => printTable('MeritDiffTable', 'MeritDiffTitle')}
             className="p-2 text-orange-600 hover:text-orange-800"
             title="طباعة الجدول"
@@ -3025,8 +2967,8 @@ const MeritTable: React.FC<MeritTableDiffrenceProps> = ({ data, termA, termB, is
             <Printer className="w-5 h-5" />
           </motion.button>
           <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => exportToExcel('MeritDiffTable')}
             className="p-2 text-green-600 hover:text-green-800"
             title="تصدير إلى ملف إكسل"
@@ -3063,16 +3005,16 @@ const MeritTable: React.FC<MeritTableDiffrenceProps> = ({ data, termA, termB, is
                   {stat.countA}
                 </td>
                 <td className={`px-6 py-4 whitespace-nowrap text-sm text-center border-l-2 border-gray-100 ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
-                  {stat.percentageA}%
+                  {(stat.percentageA).toFixed(2)}%
                 </td>
                 <td className={`px-6 py-4 whitespace-nowrap text-sm text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
                   {stat.countB}
                 </td>
                 <td className={`px-6 py-4 whitespace-nowrap text-sm text-center border-l-2 border-gray-100 ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
-                  {stat.percentageB}%
+                  {(stat.percentageB).toFixed(2)}%
                 </td>
                 <td className={`px-6 py-4 whitespace-nowrap text-sm text-center border-l-2 border-gray-100 ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
-                  {stat.indicator !== 'المجموع' ? `${stat.difference}%` : '-'}
+                  {stat.indicator !== 'المجموع' ? `${(stat.difference).toFixed(2)}%` : '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-center">
                   {stat.remark && (
@@ -3086,6 +3028,21 @@ const MeritTable: React.FC<MeritTableDiffrenceProps> = ({ data, termA, termB, is
           </tbody>
         </table>
       </div>
+
+      {showChart && (
+        <MeritChart
+          data={stats.map(row => ({
+            subject: row.indicator,
+            meritTermApercentage: row.percentageA,
+            meritTermBpercentage: row.percentageB,
+          }))}
+          title={`مقارنة المتوسطات بين ${termA} و ${termB}`}
+          termA={termA}
+          termB={termB}
+          isDarkMode={isDarkMode}
+          onClose={() => setShowChart(false)}
+        />
+      )}
 
     </div>
   );
@@ -3162,12 +3119,12 @@ export function FinalGuidanceAnalysisPage({ data, isDarkMode }: ProgressiveDirec
 
       {/* Table 3: Gender-based Statistics */}
       <div className="mb-8">
-        <GenderStatsTable stats={genderStats} isDarkMode={isDarkMode} data={filteredData} />
+        <GenderStatsTable isDarkMode={isDarkMode} data={filteredData} termA={filters.subjectTermA} termB={filters.subjectTermB} />
       </div>
 
       {/* Table 4: Repeat-based Statistics */}
       <div className="mb-8">
-        <RepeatStatsTable stats={repeatStats} isDarkMode={isDarkMode} data={filteredData} />
+        <RepeatStatsTable isDarkMode={isDarkMode} data={filteredData} termA={filters.subjectTermA} termB={filters.subjectTermB} />
       </div>
 
       {/* Table 6: Detailed Grade Distribution */}
