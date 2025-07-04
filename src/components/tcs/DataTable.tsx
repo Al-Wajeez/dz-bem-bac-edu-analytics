@@ -233,31 +233,39 @@ export function DataTable({
           const transferGrade = Number(row.original['معدل الإنتقال']) || 0;
 
           let age = 0;
+
           if (birthDateStr && typeof birthDateStr === 'string') {
             const [day, month, year] = birthDateStr.split('-').map(Number);
-            const birthDate = new Date(day, month, year);
-            console.log('التاريخ' + birthDate)
+
+            // JS Date expects (year, monthIndex[0-11], day)
+            const birthDate = new Date(day, month - 1, year);
             const today = new Date();
-            age = today.getFullYear() - birthDate.getFullYear();
-            const hasBirthdayPassed =
-              today.getMonth() > birthDate.getMonth() ||
-              (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
-            if (!hasBirthdayPassed) age--;
+
+            let years = today.getFullYear() - birthDate.getFullYear();
+            let months = today.getMonth() - birthDate.getMonth();
+            let days = today.getDate() - birthDate.getDate();
+
+            if (days < 0) {
+              months--;
+            }
+            if (months < 0) {
+              years--;
+              months += 12;
+            }
+
+            // Final age as decimal with one digit precision
+            age = +(years + months / 12).toFixed(1);
           }
-
-          console.log('السن' + age)
           
-          
-
           // Decision logic
           let suggestion = '';
-          if (age < 16 && transferGrade >= 10) {
+          if (age < 16.6 && transferGrade >= 10) {
             suggestion = 'ينتقل إلى قسم أعلى';
-          } else if (age < 16 && transferGrade < 10) {
+          } else if (age < 16.6 && transferGrade < 10) {
           suggestion =  'يعيد السنة';
-          } else if (age >= 16 && transferGrade >= 10) {
+          } else if (age >= 16.6 && transferGrade >= 10) {
             suggestion = 'ينتقل إلى قسم أعلى';
-          } else if (age >= 16 && transferGrade < 10) {
+          } else if (age >= 16.6 && transferGrade < 10) {
             suggestion = 'يوجه إلى التكوين المهني'
           }
 
