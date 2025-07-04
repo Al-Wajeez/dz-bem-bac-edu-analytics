@@ -1,78 +1,159 @@
 import { NotebookPen, X } from 'lucide-react';
 import React from 'react';
 
-interface MeritStats {
+interface MeritComparison {
   indicator: string;
-  count: number;
-  percentage?: string;
+  countA: number;
+  percentageA: number;
+  countB: number;
+  percentageB: number;
+  difference: number;
+  remark: string;
+  remarkType: 'success' | 'info' | 'secondary';
 }
 
-const MeritQualitativeAnalysis: React.FC<{stats: MeritStats[]; onClose: () => void;}> = ({ stats, onClose }) => {
-    const getMeritAnalysis = (stats: MeritStats[]): JSX.Element[] => {
-      const total = stats.find(stat => stat.indicator === 'المجموع')?.count || 0;
-      const meritCount = stats.find(stat => stat.indicator === 'إمتياز')?.count || 0;
-      const congratulationCount = stats.find(stat => stat.indicator === 'تهنئة')?.count || 0;
-      const encouragementCount = stats.find(stat => stat.indicator === 'تشجيع')?.count || 0;
-      const honorBoardCount = stats.find(stat => stat.indicator === 'لوحة شرف')?.count || 0;
-      const noteCount = stats.find(stat => stat.indicator === 'ملاحظة')?.count || 0;
+interface MeritQualitativeAnalysisProps {
+  termA: string;
+  termB: string;
+  comparisons: MeritComparison[];
+  onClose: () => void;
+}
 
-      const meritPercentage = (meritCount / total) * 100;
-      const congratulationPercentage = (congratulationCount / total) * 100;
-      const encouragementPercentage = (encouragementCount / total) * 100;
-      const honorBoardPercentage = (honorBoardCount / total) * 100;
-      const notePercentage = (noteCount / total) * 100;
-      const excellentAndCongratulated = meritPercentage + congratulationPercentage;
+const getMeritDescription = (indicator: string): string => {
+  switch(indicator) {
+    case 'إمتياز': return 'أعلى مستوى من التميز الأكاديمي (18-20)';
+    case 'تهنئة': return 'أداء متميز جداً (15-17.99)';
+    case 'تشجيع': return 'أداء متميز (14-14.99)';
+    case 'لوحة شرف': return 'أداء جيد جداً (12-13.99)';
+    case 'ملاحظة': return 'أداء يحتاج لتحسين (أقل من 12)';
+    default: return '';
+  }
+};
 
-      return [
-        <p className="mb-2" key="intro">
-          تشير المؤشرات النوعية إلى أن عدد التلاميذ المتميزين بلغ {meritCount}، أي بنسبة ({meritPercentage.toFixed(1)}%) من مجموع التلاميذ، في حين بلغ عدد المهنئين {congratulationCount} بنسبة ({congratulationPercentage.toFixed(1)}%). أما التلاميذ المشجعون فعددهم {encouragementCount} ({encouragementPercentage.toFixed(1)}%)، فيما بلغ عدد التلاميذ الذين تم إدراجهم في لوحة الشرف {honorBoardCount}، بنسبة ({honorBoardPercentage.toFixed(1)}%). من جهة أخرى، يمثل التلاميذ الملاحظون النسبة الأكبر، حيث بلغ عددهم {noteCount} أي ما يعادل ({notePercentage.toFixed(1)}%).
-        </p>,
-        <p className="mb-2" key="performance">
-          تعكس هذه المعطيات مؤشراً دالاً على تفاوت كبير في الأداء. فالنسبة العامة للتلاميذ الذين حصلوا على امتياز أو تهنئة لا تتجاوز ({excellentAndCongratulated.toFixed(1)}%)، وهي نسبة متواضعة تُبرز الحاجة إلى تعزيز ثقافة التميز وتوفير بيئة تعليمية محفزة تُراعي الفروق الفردية وتستنهض الطاقات الكامنة لدى التلاميذ.
-        </p>,
-        notePercentage > 50 ? (
-          <p className="mb-2" key="note-high">
-            كما أن النسبة المرتفعة للتلاميذ الملاحظين ({notePercentage.toFixed(1)}%) تُنذر بوجود صعوبات تربوية وبيداغوجية تتطلب تدخلاً عاجلاً، سواء على مستوى الدعم النفسي التربوي أو عبر خطط معالجة فردية/جماعية تساعد التلاميذ على تجاوز تعثراتهم.
-          </p>
-        ) : notePercentage > 30 ? (
-          <p className="mb-2" key="note-medium">
-            أما نسبة التلاميذ الملاحظين ({notePercentage.toFixed(1)}%) فهي متوسطة لكنها تدعو إلى تحسينات بيداغوجية مستمرة عبر أنشطة علاجية وتدبير فعال لزمن التعلم ودينامية القسم.
-          </p>
-        ) : (
-          <p className="mb-2" key="note-low">
-            وتُعد نسبة التلاميذ الملاحظين ({notePercentage.toFixed(1)}%) منخفضة، مما يعكس أثراً إيجابيًا للجهود التربوية المبذولة، ويؤكد أهمية مواصلة هذه المقاربات الناجعة لضمان تطور مستدام في الأداء المدرسي.
-          </p>
-        ),
-        <p key="conclusion">
-          في ضوء هذه المؤشرات، تقتضي الضرورة التربوية توجيه مجهودات الفريق التربوي نحو ترسيخ ثقافة التميز، وتوفير آليات الدعم التربوي المستمر للفئات المتعثرة، بما يضمن تحسين النتائج في المستقبل وتعزيز مؤشرات الجودة التعليمية بالمؤسسة.
-        </p>
-      ];
-    };
+const getImprovementLevel = (difference: number): string => {
+  if (difference >= 15) return 'كبير جدًا';
+  if (difference >= 10) return 'كبير';
+  if (difference >= 5) return 'ملحوظ';
+  return 'طفيف';
+};
 
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col">
+const getCategorySpecificAnalysis = (
+  indicator: string,
+  percentageA: number,
+  percentageB: number,
+  termA: string,
+  termB: string
+): string => {
+  const isImproved = percentageB > percentageA;
+  const difference = Math.abs(percentageB - percentageA);
+  const improvementLevel = getImprovementLevel(difference);
+  const meritDesc = getMeritDescription(indicator);
+
+  const baseAnalysis = `في فئة ${indicator} (${meritDesc})، تحسنت النسبة من ${percentageA.toFixed(2)}% في ${termA} إلى ${percentageB.toFixed(2)}% في ${termB}، مما يشير إلى ${isImproved ? 'تحسن' : 'تراجع'} ${improvementLevel} في هذا المستوى من الأداء.`;
+
+  const categorySpecifics: { [key: string]: string } = {
+    'إمتياز': `هذا ${isImproved ? 'التحسن' : 'التراجع'} يعكس ${isImproved ? 'زيادة في' : 'انخفاضًا في'} عدد الطلاب المتميزين أكاديميًا.`,
+    'تهنئة': `تشير هذه النتائج إلى ${isImproved ? 'تحسن' : 'تراجع'} في عدد الطلاب ذوي الأداء المتميز جدًا.`,
+    'تشجيع': `هذا ${isImproved ? 'التحسن' : 'تراجع'} يدل على ${isImproved ? 'زيادة' : 'انخفاض'} في عدد الطلاب المتميزين.`,
+    'لوحة شرف': `تعكس هذه النتائج ${isImproved ? 'تحسن' : 'تراجع'} في عدد الطلاب ذوي الأداء الجيد جدًا.`,
+    'ملاحظة': `هذا ${isImproved ? 'التحسن' : 'تراجع'} يشير إلى ${isImproved ? 'انخفاض' : 'زيادة'} في عدد الطلاب الذين يحتاجون لتحسين أدائهم.`,
+  };
+
+  return `${baseAnalysis} ${categorySpecifics[indicator] || ''}`;
+};
+
+const MeritQualitativeAnalysis: React.FC<MeritQualitativeAnalysisProps> = ({ 
+  termA,
+  termB,
+  comparisons,
+  onClose 
+}) => {
+  // Filter out total row and empty categories
+  const validComparisons = comparisons.filter(c => 
+    c.indicator !== 'المجموع' && (c.countA > 0 || c.countB > 0)
+  );
+  
+  // Find most improved and most declined categories
+  const mostImproved = validComparisons.reduce((prev, curr) => 
+    (curr.percentageB - curr.percentageA) > (prev.percentageB - prev.percentageA) ? curr : prev, validComparisons[0]);
+  
+  const mostDeclined = validComparisons.reduce((prev, curr) => 
+    (curr.percentageA - curr.percentageB) > (prev.percentageA - prev.percentageB) ? curr : prev, validComparisons[0]);
+
+  // Calculate overall improvement in excellence categories
+  const excellenceImprovement = validComparisons
+    .filter(c => ['إمتياز', 'تهنئة', 'تشجيع'].includes(c.indicator))
+    .reduce((sum, curr) => sum + (curr.percentageB - curr.percentageA), 0);
+
+  const overallTrend = excellenceImprovement > 0 ? 'تحسن' : 'تراجع';
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className={`bg-white rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col`}>
         <div className="flex items-center justify-between p-6 border-b" dir="rtl">
-            <h3 className="text-lg font-bold flex items-center gap-2">
-                <NotebookPen className="w-5 h-5" />
-                التحليل النوعي للمؤشرات البيداغوجية
-                </h3>
-                <button 
-                onClick={onClose} 
-                className="text-gray-500 hover:text-gray-700 p-1"
-                >
-                <X className="w-6 h-6" />
-                </button>
-            </div>
-    
-          <div className="overflow-y-auto p-6 text-justify flex-1">
-            <p className="m-4">
-              {getMeritAnalysis(stats)}
+          <h3 className="text-lg font-bold flex items-center gap-2">
+            <NotebookPen className="w-5 h-5" />
+            التحليل النوعي للتوزيع النوعي بين {termA} و {termB}
+          </h3>
+          <button 
+            onClick={onClose} 
+            className="text-gray-500 hover:text-gray-700 p-1"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="overflow-y-auto p-6 text-justify flex-1" dir="rtl">
+          <div className="mb-6 bg-blue-50 p-4 rounded-md">
+            <h4 className="font-bold mb-2">النظرة العامة</h4>
+            <p>
+              بناءً على تحليل التوزيع النوعي بين {termA} و {termB}، نلاحظ وجود {overallTrend} عام في فئات التميز بمعدل {Math.abs(excellenceImprovement).toFixed(2)}%.
+              وقد سجلت فئة {mostImproved.indicator} أكبر تحسن بمقدار {(mostImproved.percentageB - mostImproved.percentageA).toFixed(2)}%،
+              بينما شهدت فئة {mostDeclined.indicator} أكبر تراجع بمقدار {(mostDeclined.percentageA - mostDeclined.percentageB).toFixed(2)}%.
             </p>
+          </div>
+
+          {validComparisons.map((comparison) => (
+            <div key={comparison.indicator} className="border-b p-4 mb-4">
+              <h4 className="font-bold mb-2">{comparison.indicator}</h4>
+              <p className="mb-2">
+                {getCategorySpecificAnalysis(
+                  comparison.indicator,
+                  comparison.percentageA,
+                  comparison.percentageB,
+                  termA,
+                  termB
+                )}
+              </p>
+              <div className="flex justify-between items-center mt-2">
+                <span className="text-sm text-gray-600">
+                  عدد الطلاب: {comparison.countA} في {termA} → {comparison.countB} في {termB}
+                </span>
+                <span className={`px-2 inline-flex text-sm leading-5 font-semibold rounded-md py-2 ${
+                  comparison.remarkType === 'success' ? 'bg-green-100 text-green-800' :
+                  comparison.remarkType === 'info' ? 'bg-blue-100 text-blue-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {comparison.remark}
+                </span>
+              </div>
+            </div>
+          ))}
+
+          <div className="mt-6 bg-yellow-50 p-4 rounded-md">
+            <h4 className="font-bold mb-2">التوصيات</h4>
+            <ul className="list-disc pr-5 space-y-2">
+              <li>تعزيز برامج التميز الأكاديمي للحفاظ على التحسن في فئة {mostImproved.indicator}</li>
+              <li>وضع خطة علاجية لمعالجة التراجع في فئة {mostDeclined.indicator}</li>
+              <li>تحليل عوامل النجاح في الفئات التي شهدت تحسنًا ملحوظًا</li>
+              <li>مراجعة استراتيجيات التدريس للفئات التي شهدت تراجعًا</li>
+              <li>تنظيم ورش عمل لتبادل أفضل الممارسات بين المعلمين</li>
+            </ul>
           </div>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
 export default MeritQualitativeAnalysis;

@@ -44,10 +44,10 @@ import MeritChart from './charts/DiffChart/MeritStatsChart';
 import SubjectStatsQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/SubjectStatsQualitativeAnalysis';
 import GradeDistributionQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/GradeDistributionQualitativeAnalysis';
 import SubjectPassQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/SubjectPassQualitativeAnalysis';
-//import DetailedGradeDistributionQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/DetailedGradeDistributionQualitativeAnalysis';
-//import HarmonyStatsQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/HarmonyStatsQualitativeAnalysis';
-//import CategoryStatsQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/CategoryStatsQualitativeAnalysis';
-//import MeritQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/MeritQualitativeAnalysis';
+import DetailedGradeDistributionQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/DetailedGradeDistributionQualitativeAnalysis';
+import HarmonyStatsQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/HarmonyStatsQualitativeAnalysis';
+import CategoryStatsQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/CategoryStatsQualitativeAnalysis';
+import MeritQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/MeritQualitativeAnalysis';
 
 // Register Chart.js components
 ChartJS.register(
@@ -1977,6 +1977,16 @@ interface DetailedGradeDistributionTableDiffrenceProps {
   termB: string;
   isDarkMode: boolean;
 }
+interface GradeDistributionComparison {
+  subject: string;
+  termACount: number;
+  termAPercentage: string;
+  termBCount: number;
+  termBPercentage: string;
+  difference: string;
+  remark: string;
+  remarkType: 'success' | 'danger' | 'secondary';
+}
 const DetailedGradeDistributionTable: React.FC<DetailedGradeDistributionTableDiffrenceProps> = ({ data, termA, termB, isDarkMode }) => {
   const [activeTab, setActiveTab] = useState<
     'range0To8' | 'range9To9' | 'range10To11' | 
@@ -1984,7 +1994,11 @@ const DetailedGradeDistributionTable: React.FC<DetailedGradeDistributionTableDif
   >('range0To8');
   
   const [showChart, setShowChart] = useState<boolean>(false);
-  const [showAnalysis, setShowAnalysis] = useState<boolean>(false);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<{
+    comparisons: GradeDistributionComparison[];
+    gradeRange: 'range0To8' | 'range9To9' | 'range10To11' | 
+                'range12To13' | 'range14To15' | 'range16To17' | 'range18To20';
+  } | null>(null);
 
   const handlePrint = () => {
     if (activeTab === 'range0To8') {
@@ -2159,9 +2173,11 @@ const DetailedGradeDistributionTable: React.FC<DetailedGradeDistributionTableDif
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setShowAnalysis(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
-            disabled
+            onClick={() => setSelectedAnalysis({
+              comparisons: currentDistribution,
+              gradeRange: activeTab
+            })}
+            className="p-2 text-purple-600 hover:text-purple-800"
             title="التحليل النوعي"
           >
             <NotebookPen className="w-5 h-5" />
@@ -2353,6 +2369,15 @@ const DetailedGradeDistributionTable: React.FC<DetailedGradeDistributionTableDif
           onClose={() => setShowChart(false)}
         />
       )}
+      {selectedAnalysis && (
+        <DetailedGradeDistributionQualitativeAnalysis
+          termA={termA}
+          termB={termB}
+          comparisons={selectedAnalysis.comparisons}
+          gradeRange={selectedAnalysis.gradeRange}
+          onClose={() => setSelectedAnalysis(null)}
+        />
+      )}
     </div>
   );
 };
@@ -2364,9 +2389,17 @@ interface HarmonyStatsTableDiffrenceProps {
   termB: string;
   isDarkMode: boolean;
 }
+interface HarmonyComparison {
+  subject: string;
+  harmonyRatioA: number;
+  harmonyRatioB: number;
+  difference: number;
+  remark: string;
+  remarkType: 'success' | 'info' | 'secondary';
+}
 const HarmonyStatsTable: React.FC<HarmonyStatsTableDiffrenceProps> = ({ data, termA, termB, isDarkMode }) => {
   const [showChart, setShowChart] = useState<boolean>(false);
-  const [showAnalysis, setShowAnalysis] = useState<boolean>(false);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<HarmonyComparison[] | null>(null);
   // Helper to extract value from subject item
   const getSubjectValue = (subject: string | { value: string }) =>
     typeof subject === 'string' ? subject : subject.value;
@@ -2443,9 +2476,8 @@ const HarmonyStatsTable: React.FC<HarmonyStatsTableDiffrenceProps> = ({ data, te
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setShowAnalysis(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
-            disabled
+            onClick={() => setSelectedAnalysis(stats)}
+            className="p-2 text-purple-600 hover:text-purple-800"
             title="التحليل النوعي"
           >
             <NotebookPen className="w-5 h-5" />
@@ -2527,6 +2559,14 @@ const HarmonyStatsTable: React.FC<HarmonyStatsTableDiffrenceProps> = ({ data, te
           onClose={() => setShowChart(false)}
         />
       )}
+      {selectedAnalysis && (
+        <HarmonyStatsQualitativeAnalysis
+          termA={termA}
+          termB={termB}
+          comparisons={selectedAnalysis}
+          onClose={() => setSelectedAnalysis(null)}
+        />
+      )}
     </div>
   );
 };
@@ -2538,6 +2578,16 @@ interface CategoryStatsTableDiffrenceProps {
   termB: string;
   isDarkMode: boolean;
 }
+interface CategoryComparison {
+  subject: string;
+  termACount: number;
+  termAPercentage: string;
+  termBCount: number;
+  termBPercentage: string;
+  difference: string;
+  remark: string;
+  remarkType: 'success' | 'danger' | 'secondary';
+}
 const CategoryStatsTable: React.FC<CategoryStatsTableDiffrenceProps> = ({ data, termA, termB, isDarkMode }) => {
   const [activeTab, setActiveTab] = useState<
     'weakCategory' | 'nearAverageCategory' | 'averageCategory' | 
@@ -2545,7 +2595,11 @@ const CategoryStatsTable: React.FC<CategoryStatsTableDiffrenceProps> = ({ data, 
   >('weakCategory');
   
   const [showChart, setShowChart] = useState<boolean>(false);
-  const [showAnalysis, setShowAnalysis] = useState<boolean>(false);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<{
+    comparisons: CategoryComparison[];
+    category: 'weakCategory' | 'nearAverageCategory' | 'averageCategory' | 
+              'goodCategory' | 'excellentCategory';
+  } | null>(null);
 
   const handlePrint = () => {
     if (activeTab === 'weakCategory') {
@@ -2721,9 +2775,11 @@ const CategoryStatsTable: React.FC<CategoryStatsTableDiffrenceProps> = ({ data, 
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setShowAnalysis(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
-            disabled
+            onClick={() => setSelectedAnalysis({
+              comparisons: currentDistribution,
+              category: activeTab
+            })}
+            className="p-2 text-purple-600 hover:text-purple-800"
             title="التحليل النوعي"
           >
             <NotebookPen className="w-5 h-5" />
@@ -2887,6 +2943,15 @@ const CategoryStatsTable: React.FC<CategoryStatsTableDiffrenceProps> = ({ data, 
           onClose={() => setShowChart(false)}
         />
       )}
+      {selectedAnalysis && (
+        <CategoryStatsQualitativeAnalysis
+          termA={termA}
+          termB={termB}
+          comparisons={selectedAnalysis.comparisons}
+          category={selectedAnalysis.category}
+          onClose={() => setSelectedAnalysis(null)}
+        />
+      )}
     </div>
   );
 };
@@ -2898,9 +2963,20 @@ interface MeritTableDiffrenceProps {
   termB: string;
   isDarkMode: boolean;
 }
+interface MeritComparison {
+  indicator: string;
+  countA: number;
+  percentageA: number;
+  countB: number;
+  percentageB: number;
+  difference: number;
+  remark: string;
+  remarkType: 'success' | 'info' | 'secondary';
+}
+
 const MeritTable: React.FC<MeritTableDiffrenceProps> = ({ data, termA, termB, isDarkMode }) => {
   const [showChart, setShowChart] = useState<boolean>(false);
-  const [showAnalysis, setShowAnalysis] = useState<boolean>(false);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<MeritComparison[] | null>(null);
 
   // Get the appropriate field name for each term's average
   const getTermAverageField = (term: string): string => {
@@ -3009,8 +3085,8 @@ const MeritTable: React.FC<MeritTableDiffrenceProps> = ({ data, termA, termB, is
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setShowAnalysis(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
+            onClick={() => setSelectedAnalysis(stats)}
+            className="p-2 text-purple-600 hover:text-purple-800"
             title="عرض التحليل النوعي"
           >
             <NotebookPen className="w-5 h-5" />
@@ -3108,6 +3184,14 @@ const MeritTable: React.FC<MeritTableDiffrenceProps> = ({ data, termA, termB, is
           termB={termB}
           isDarkMode={isDarkMode}
           onClose={() => setShowChart(false)}
+        />
+      )}
+      {selectedAnalysis && (
+        <MeritQualitativeAnalysis
+          termA={termA}
+          termB={termB}
+          comparisons={selectedAnalysis}
+          onClose={() => setSelectedAnalysis(null)}
         />
       )}
 
