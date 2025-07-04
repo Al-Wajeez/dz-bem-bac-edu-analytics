@@ -235,7 +235,8 @@ export function DataTable({
           let age = 0;
           if (birthDateStr && typeof birthDateStr === 'string') {
             const [day, month, year] = birthDateStr.split('-').map(Number);
-            const birthDate = new Date(year, month - 1, day);
+            const birthDate = new Date(day, month, year);
+            console.log('التاريخ' + birthDate)
             const today = new Date();
             age = today.getFullYear() - birthDate.getFullYear();
             const hasBirthdayPassed =
@@ -244,12 +245,20 @@ export function DataTable({
             if (!hasBirthdayPassed) age--;
           }
 
+          console.log('السن' + age)
+          
+          
+
           // Decision logic
           let suggestion = '';
-          if (age < 16) {
-            suggestion = transferGrade >= 10 ? 'ينتقل إلى قسم أعلى' : 'يعيد السنة';
-          } else {
-            suggestion = transferGrade >= 10 ? 'ينتقل إلى قسم أعلى' : 'يوجه إلى التكوين المهني';
+          if (age < 16 && transferGrade >= 10) {
+            suggestion = 'ينتقل إلى قسم أعلى';
+          } else if (age < 16 && transferGrade < 10) {
+          suggestion =  'يعيد السنة';
+          } else if (age >= 16 && transferGrade >= 10) {
+            suggestion = 'ينتقل إلى قسم أعلى';
+          } else if (age >= 16 && transferGrade < 10) {
+            suggestion = 'يوجه إلى التكوين المهني'
           }
 
           // Save to original object
