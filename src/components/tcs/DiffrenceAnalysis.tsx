@@ -17,18 +17,18 @@ import { filterStudents } from '../../utils/DiffrencefilterStudents';
 import { FilterModal } from './filter/DiffrenceFilterModal';
 
 // Printable Analysis
-import SubjectStatsPrintableAnalysis from './printanalysis/SubjectStats';
-import GradeDistributionPrintableAnalysis from './printanalysis/GradeDistribution';
-import CategoryDistributionPrintableAnalysis from './printanalysis/CategoryStats';
-import HarmonyPrintableAnalysis from './printanalysis/HarmonyStats';
-import DetailedGradePrintableAnalysis from './printanalysis/DetailedGradeDistribution';
-import SubjectPassPrintableAnalysis from './printanalysis/SubjectPass';
-import GeneralDepartmentPerformanceAnalysis from './printanalysis/DepartmentStats';
-import SchoolPerformancePrintableAnalysis from './printanalysis/SchoolStats';
-import DirectoratePerformancePrintableAnalysis from './printanalysis/DirectoratePerformanceStats';
-import MeritPerformancePrintableAnalysis from './printanalysis/MeritStats';
-import FailingStudentsPrintableAnalysis from './printanalysis/LowestFailing';
-import TopStudentsPrintableAnalysis from './printanalysis/TopStudents';
+//import SubjectStatsPrintableAnalysis from './printanalysis/SubjectStats';
+//import GradeDistributionPrintableAnalysis from './printanalysis/GradeDistribution';
+//import CategoryDistributionPrintableAnalysis from './printanalysis/CategoryStats';
+//import HarmonyPrintableAnalysis from './printanalysis/HarmonyStats';
+//import DetailedGradePrintableAnalysis from './printanalysis/DetailedGradeDistribution';
+//import SubjectPassPrintableAnalysis from './printanalysis/SubjectPass';
+//import GeneralDepartmentPerformanceAnalysis from './printanalysis/DepartmentStats';
+//import SchoolPerformancePrintableAnalysis from './printanalysis/SchoolStats';
+//import DirectoratePerformancePrintableAnalysis from './printanalysis/DirectoratePerformanceStats';
+//import MeritPerformancePrintableAnalysis from './printanalysis/MeritStats';
+//import FailingStudentsPrintableAnalysis from './printanalysis/LowestFailing';
+//import TopStudentsPrintableAnalysis from './printanalysis/TopStudents';
 
 // Charts
 import SubjectStatsChart from './charts/DiffChart/SubjectStatsChart';
@@ -41,18 +41,13 @@ import MeritChart from './charts/DiffChart/MeritStatsChart';
 
 
 // Qualitative Analysis
-import SubjectStatsQualitativeAnalysis from './QualitativeAnalysis/SubjectStatsQualitativeAnalysis';
-import GradeDistributionQualitativeAnalysis from './QualitativeAnalysis/GradeDistributionQualitativeAnalysis';
-import SubjectPassQualitativeAnalysis from './QualitativeAnalysis/SubjectPassQualitativeAnalysis';
-import DetailedGradeDistributionQualitativeAnalysis from './QualitativeAnalysis/DetailedGradeDistributionQualitativeAnalysis';
-import HarmonyStatsQualitativeAnalysis from './QualitativeAnalysis/HarmonyStatsQualitativeAnalysis';
-import CategoryStatsQualitativeAnalysis from './QualitativeAnalysis/CategoryStatsQualitativeAnalysis';
-import DepartmentStatsQualitativeAnalysis from './QualitativeAnalysis/DepartmentStatsQualitativeAnalysis';
-import SchoolStatsQualitativeAnalysis from './QualitativeAnalysis/SchoolStatsQualitativeAnalysis';
-import DirectoratePerformanceStatsQualitativeAnalysis from './QualitativeAnalysis/DirectoratePerformanceStatsQualitativeAnalysis';
-import MeritQualitativeAnalysis from './QualitativeAnalysis/MeritQualitativeAnalysis';
-import TopStudentsQualitativeAnalysis from './QualitativeAnalysis/TopStudentsQualitativeAnalysis';
-import LowestFailingStudentsQualitativeAnalysis from './QualitativeAnalysis/LowestFailingStudentsQualitativeAnalysis';
+import SubjectStatsQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/SubjectStatsQualitativeAnalysis';
+import GradeDistributionQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/GradeDistributionQualitativeAnalysis';
+import SubjectPassQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/SubjectPassQualitativeAnalysis';
+//import DetailedGradeDistributionQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/DetailedGradeDistributionQualitativeAnalysis';
+//import HarmonyStatsQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/HarmonyStatsQualitativeAnalysis';
+//import CategoryStatsQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/CategoryStatsQualitativeAnalysis';
+//import MeritQualitativeAnalysis from './QualitativeAnalysis/DiffAnalysis/MeritQualitativeAnalysis';
 
 // Register Chart.js components
 ChartJS.register(
@@ -621,7 +616,7 @@ interface Student {
   'القرار': string;
   'الملمح': string;
   'اللغة العربية': number;
-  'اللغة الأمازيغية': number;
+  'اللغة اﻷمازيغية': number;
   'اللغة الفرنسية': number;
   'اللغة الإنجليزية': number;
   'التربية الإسلامية': number;
@@ -642,7 +637,7 @@ interface Student {
 function enrichStudentsWithDecisionAndProfile(students: Student[]): Student[] {
   const subjects = [
     'اللغة العربية',
-    'اللغة الأمازيغية',
+    'اللغة اﻷمازيغية',
     'اللغة الفرنسية',
     'اللغة الإنجليزية',
     'التربية الإسلامية',
@@ -813,22 +808,22 @@ const getRemarkTypeClass = (type: RemarkType): string => {
 // Subject lists by term
 const subjectsByTerm: Record<string, string[]> = {
   'الفصل الأول': [
-    'اللغة العربية ف 1', 'اللغة الأمازيغية ف 1', 'اللغة الفرنسية ف 1', 'اللغة الإنجليزية ف 1', 'التربية الإسلامية ف 1',
+    'اللغة العربية ف 1', 'اللغة اﻷمازيغية ف 1', 'اللغة الفرنسية ف 1', 'اللغة الإنجليزية ف 1', 'التربية الإسلامية ف 1',
     'التربية المدنية ف 1', 'التاريخ والجغرافيا ف 1', 'الرياضيات ف 1', 'ع الطبيعة و الحياة ف 1', 'ع الفيزيائية والتكنولوجيا ف 1', 'المعلوماتية ف 1',
     'التربية التشكيلية ف 1', 'التربية الموسيقية ف 1', 'ت البدنية و الرياضية ف 1', 'المعدل السنوي', 'معدل ش ت م'
   ],
   'الفصل الثاني': [
-    'اللغة العربية ف 2', 'اللغة الأمازيغية ف 2', 'اللغة الفرنسية ف 2', 'اللغة الإنجليزية ف 2', 'التربية الإسلامية ف 2',
+    'اللغة العربية ف 2', 'اللغة اﻷمازيغية ف 2', 'اللغة الفرنسية ف 2', 'اللغة الإنجليزية ف 2', 'التربية الإسلامية ف 2',
     'التربية المدنية ف 2', 'التاريخ والجغرافيا ف 2', 'الرياضيات ف 2', 'ع الطبيعة و الحياة ف 2', 'ع الفيزيائية والتكنولوجيا ف 2', 'المعلوماتية ف 2',
     'التربية التشكيلية ف 2', 'التربية الموسيقية ف 2', 'ت البدنية و الرياضية ف 2', 'المعدل السنوي', 'معدل ش ت م'
   ],
   'الفصل الثالث': [
-    'اللغة العربية ف 3', 'اللغة الأمازيغية ف 3', 'اللغة الفرنسية ف 3', 'اللغة الإنجليزية ف 3', 'التربية الإسلامية ف 3',
+    'اللغة العربية ف 3', 'اللغة اﻷمازيغية ف 3', 'اللغة الفرنسية ف 3', 'اللغة الإنجليزية ف 3', 'التربية الإسلامية ف 3',
     'التربية المدنية ف 3', 'التاريخ والجغرافيا ف 3', 'الرياضيات ف 3', 'ع الطبيعة و الحياة ف 3', 'ع الفيزيائية والتكنولوجيا ف 3', 'المعلوماتية ف 3',
     'التربية التشكيلية ف 3', 'التربية الموسيقية ف 3', 'ت البدنية و الرياضية ف 3', 'المعدل السنوي', 'معدل ش ت م'
   ],
   'المعدلات السنوية': [
-    'اللغة العربية م س', 'اللغة الأمازيغية م س', 'اللغة الفرنسية م س', 'اللغة الإنجليزية م س', 'التربية الإسلامية م س',
+    'اللغة العربية م س', 'اللغة اﻷمازيغية م س', 'اللغة الفرنسية م س', 'اللغة الإنجليزية م س', 'التربية الإسلامية م س',
     'التربية المدنية م س', 'التاريخ والجغرافيا م س', 'الرياضيات م س', 'ع الطبيعة و الحياة م س', 'ع الفيزيائية والتكنولوجيا م س', 'المعلوماتية م س',
     'التربية التشكيلية م س', 'التربية الموسيقية م س', 'ت البدنية و الرياضية م س', 'المعدل السنوي', 'معدل ش ت م'
   ],
@@ -955,7 +950,7 @@ const calculateMedian = (grades: number[]): number => {
 
 const certificateSubjectMap: Record<string, string> = {
   'اللغة العربية': 'العربية ش ت م',
-  'اللغة الأمازيغية': 'الأمازيغية ش ت م',
+  'اللغة اﻷمازيغية': 'اﻷمازيغية ش ت م',
   'اللغة الفرنسية': 'الفرنسية ش ت م',
   'اللغة الإنجليزية': 'الإنجليزية ش ت م',
   'التربية الإسلامية': 'ت إسلامية ش ت م',
@@ -973,7 +968,7 @@ const certificateSubjectMap: Record<string, string> = {
 
 const S1SubjectMap: Record<string, string> = {
   'اللغة العربية': 'اللغة العربية ف 1',
-  'اللغة الأمازيغية': 'اللغة الأمازيغية ف 1',
+  'اللغة اﻷمازيغية': 'اللغة اﻷمازيغية ف 1',
   'اللغة الفرنسية': 'اللغة الفرنسية ف 1',
   'اللغة الإنجليزية': 'اللغة الإنجليزية ف 1',
   'التربية الإسلامية': 'التربية الإسلامية ف 1',
@@ -991,7 +986,7 @@ const S1SubjectMap: Record<string, string> = {
 
 const S2SubjectMap: Record<string, string> = {
   'اللغة العربية': 'اللغة العربية ف 2',
-  'اللغة الأمازيغية': 'اللغة الأمازيغية ف 2',
+  'اللغة اﻷمازيغية': 'اللغة اﻷمازيغية ف 2',
   'اللغة الفرنسية': 'اللغة الفرنسية ف 2',
   'اللغة الإنجليزية': 'اللغة الإنجليزية ف 2',
   'التربية الإسلامية': 'التربية الإسلامية ف 2',
@@ -1009,7 +1004,7 @@ const S2SubjectMap: Record<string, string> = {
 
 const S3SubjectMap: Record<string, string> = {
   'اللغة العربية': 'اللغة العربية ف 3',
-  'اللغة الأمازيغية': 'اللغة الأمازيغية ف 3',
+  'اللغة اﻷمازيغية': 'اللغة اﻷمازيغية ف 3',
   'اللغة الفرنسية': 'اللغة الفرنسية ف 3',
   'اللغة الإنجليزية': 'اللغة الإنجليزية ف 3',
   'التربية الإسلامية': 'التربية الإسلامية ف 3',
@@ -1027,7 +1022,7 @@ const S3SubjectMap: Record<string, string> = {
 
 const AnnualSubjectMap: Record<string, string> = {
   'اللغة العربية': 'اللغة العربية م س',
-  'اللغة الأمازيغية': 'اللغة الأمازيغية م س',
+  'اللغة اﻷمازيغية': 'اللغة اﻷمازيغية م س',
   'اللغة الفرنسية': 'اللغة الفرنسية م س',
   'اللغة الإنجليزية': 'اللغة الإنجليزية م س',
   'التربية الإسلامية': 'التربية الإسلامية م س',
@@ -1078,9 +1073,19 @@ interface SubjectStatsTableDiffrenceProps {
   termB: string;
   isDarkMode: boolean;
 }
+interface TermComparison {
+  subject: string;
+  meanA: number;
+  meanB: number;
+  stdDevA: number;
+  stdDevB: number;
+  difference: number;
+  remark: string;
+  remarkType: 'success' | 'info' | 'secondary';
+}
 const SubjectStatsTable: React.FC<SubjectStatsTableDiffrenceProps> = ({ data, termA, termB, isDarkMode }) => {
   const [showChart, setShowChart] = useState<boolean>(false);
-  const [showAnalysis, setShowAnalysis] = useState<boolean>(false);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<TermComparison[] | null>(null);
   // Helper to extract value from subject item
   const getSubjectValue = (subject: string | { value: string }) =>
     typeof subject === 'string' ? subject : subject.value;
@@ -1166,11 +1171,19 @@ const SubjectStatsTable: React.FC<SubjectStatsTableDiffrenceProps> = ({ data, te
         </h2>
         <div className="flex gap-2">
           <motion.button
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-            onClick={() => setShowAnalysis(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
-            disabled
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setSelectedAnalysis(stats.map(stat => ({
+            subject: stat.subject,
+            meanA: parseFloat(stat.meanA),
+            meanB: parseFloat(stat.meanB),
+            stdDevA: parseFloat(stat.stdDevA),
+            stdDevB: parseFloat(stat.stdDevB),
+            difference: parseFloat(stat.difference),
+            remark: stat.remark,
+            remarkType: stat.remarkType
+          })))}
+            className="p-2 text-purple-600 hover:text-purple-800"
             title="التحليل النوعي"
           >
             <NotebookPen className="w-5 h-5" />
@@ -1261,6 +1274,15 @@ const SubjectStatsTable: React.FC<SubjectStatsTableDiffrenceProps> = ({ data, te
           onClose={() => setShowChart(false)}
         />
       )}
+
+      {selectedAnalysis && (
+        <SubjectStatsQualitativeAnalysis
+          termA={termA}
+          termB={termB}
+          comparisons={selectedAnalysis}
+          onClose={() => setSelectedAnalysis(null)}
+        />
+      )}
     </div>
   );
 };
@@ -1272,10 +1294,23 @@ interface GradeDistributionTableDiffrenceProps {
   termB: string;
   isDarkMode: boolean;
 }
+interface GradeDistributionComparison {
+  subject: string;
+  termACount: number;
+  termAPercentage: string;
+  termBCount: number;
+  termBPercentage: string;
+  difference: string;
+  remark: string;
+  remarkType: 'success' | 'danger' | 'secondary';
+}
 const GradeDistributionTable: React.FC<GradeDistributionTableDiffrenceProps> = ({ data, termA, termB, isDarkMode }) => {
   const [activeTab, setActiveTab] = useState<'above10' | 'between8And10' | 'below8'>('above10');
   const [showChart, setShowChart] = useState<boolean>(false);
-  const [showAnalysis, setShowAnalysis] = useState<boolean>(false);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<{
+    comparisons: GradeDistributionComparison[];
+    gradeRange: 'above10' | 'between8And10' | 'below8';
+  } | null>(null);
 
   const handlePrint = () => {
     if (activeTab === 'above10') {
@@ -1386,9 +1421,13 @@ const GradeDistributionTable: React.FC<GradeDistributionTableDiffrenceProps> = (
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setShowAnalysis(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
-            disabled
+            onClick={() => setSelectedAnalysis({
+              comparisons: activeTab === 'above10' ? above10Distribution :
+                          activeTab === 'between8And10' ? between8And10Distribution :
+                          below8Distribution,
+              gradeRange: activeTab
+            })}
+            className="p-2 text-purple-600 hover:text-purple-800"
             title="التحليل النوعي"
           >
             <NotebookPen className="w-5 h-5" />
@@ -1588,7 +1627,6 @@ const GradeDistributionTable: React.FC<GradeDistributionTableDiffrenceProps> = (
         </div>
       </div>
 
-      {/* Analysis and Chart components would go here */}
       {showChart && (
         <GradeDistributionChart
           data={
@@ -1609,6 +1647,16 @@ const GradeDistributionTable: React.FC<GradeDistributionTableDiffrenceProps> = (
         />
       )}
 
+      {selectedAnalysis && (
+        <GradeDistributionQualitativeAnalysis
+          termA={termA}
+          termB={termB}
+          comparisons={selectedAnalysis.comparisons}
+          gradeRange={selectedAnalysis.gradeRange}
+          onClose={() => setSelectedAnalysis(null)}
+        />
+      )}
+
     </div>
   );
 };
@@ -1620,9 +1668,21 @@ interface SubjectPassTableDiffrenceProps {
   termB: string;
   isDarkMode: boolean;
 }
+interface PassRateComparison {
+  subject: string;
+  passCountA: number;
+  totalCountA: number;
+  passPercentageA: number;
+  passCountB: number;
+  totalCountB: number;
+  passPercentageB: number;
+  difference: number;
+  remark: string;
+  remarkType: 'success' | 'info' | 'secondary';
+}
 const SubjectPassTable: React.FC<SubjectPassTableDiffrenceProps> = ({ data, termA, termB, isDarkMode }) => {
   const [showChart, setShowChart] = useState<boolean>(false);
-  const [showAnalysis, setShowAnalysis] = useState<boolean>(false);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<PassRateComparison[] | null>(null);
 
   // Helper to extract value from subject item
   const getSubjectValue = (subject: string | { value: string }) =>
@@ -1702,9 +1762,8 @@ const SubjectPassTable: React.FC<SubjectPassTableDiffrenceProps> = ({ data, term
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setShowAnalysis(true)}
-            className="p-2 text-gray-300 cursor-not-allowed opacity-50"
-            disabled
+            onClick={() => setSelectedAnalysis(stats)}
+            className="p-2 text-purple-600 hover:text-purple-800"
             title="التحليل النوعي"
           >
             <NotebookPen className="w-5 h-5" />
@@ -1792,6 +1851,14 @@ const SubjectPassTable: React.FC<SubjectPassTableDiffrenceProps> = ({ data, term
           termB={termB}
           isDarkMode={isDarkMode}
           onClose={() => setShowChart(false)}
+        />
+      )}
+      {selectedAnalysis && (
+        <SubjectPassQualitativeAnalysis
+          termA={termA}
+          termB={termB}
+          comparisons={selectedAnalysis}
+          onClose={() => setSelectedAnalysis(null)}
         />
       )}
     </div>

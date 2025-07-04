@@ -323,11 +323,11 @@ export function EditForm({ data, onSubmit, onClose, isDarkMode }: EditFormProps)
       { name: 'اللغة العربية م س', type: 'number'},
       { name: 'العربية ش ت م', type: 'number'},
 
-      { name: 'اللغة الأمازيغية ف 1', type: 'number'},
-      { name: 'اللغة الأمازيغية ف 2', type: 'number'},
-      { name: 'اللغة الأمازيغية ف 3', type: 'number'},
-      { name: 'اللغة الأمازيغية م س', type: 'number'},
-      { name: 'الأمازيغية ش ت م', type: 'number'},
+      { name: 'اللغة اﻷمازيغية ف 1', type: 'number'},
+      { name: 'اللغة اﻷمازيغية ف 2', type: 'number'},
+      { name: 'اللغة اﻷمازيغية ف 3', type: 'number'},
+      { name: 'اللغة اﻷمازيغية م س', type: 'number'},
+      { name: 'اﻷمازيغية ش ت م', type: 'number'},
 
       { name: 'اللغة الفرنسية ف 1', type: 'number'},
       { name: 'اللغة الفرنسية ف 2', type: 'number'},
@@ -558,17 +558,17 @@ export function EditForm({ data, onSubmit, onClose, isDarkMode }: EditFormProps)
                     <div className="flex gap-4 col-span-2">
                     <div className="w-[180px] p-4 dark:bg-gray-800">
                       <label className={`block text-sm font-medium text-gray-700 dark:text-gray-200 ${isDarkMode ? 'dark-mode' : ''}`}>
-                        اللغة الأمازيغية
+                        اللغة اﻷمازيغية
                       </label>
                     </div>
                       {fields
                         .filter(
                           (field) =>
-                          field.name === 'اللغة الأمازيغية ف 1' ||
-                          field.name === 'اللغة الأمازيغية ف 2' ||
-                          field.name === 'اللغة الأمازيغية ف 3' ||
-                          field.name === 'اللغة الأمازيغية م س' ||
-                          field.name === 'الأمازيغية ش ت م'
+                          field.name === 'اللغة اﻷمازيغية ف 1' ||
+                          field.name === 'اللغة اﻷمازيغية ف 2' ||
+                          field.name === 'اللغة اﻷمازيغية ف 3' ||
+                          field.name === 'اللغة اﻷمازيغية م س' ||
+                          field.name === 'اﻷمازيغية ش ت م'
                         )
                         .map((field) => (
                           <div key={field.name} className="flex-1">
@@ -921,11 +921,11 @@ export function EditForm({ data, onSubmit, onClose, isDarkMode }: EditFormProps)
                         field.name !== 'اللغة العربية م س' &&
                         field.name !== 'العربية ش ت م' &&
 
-                        field.name !== 'اللغة الأمازيغية ف 1' &&
-                        field.name !== 'اللغة الأمازيغية ف 2' &&
-                        field.name !== 'اللغة الأمازيغية ف 3' &&
-                        field.name !== 'اللغة الأمازيغية م س' &&
-                        field.name !== 'الأمازيغية ش ت م' &&
+                        field.name !== 'اللغة اﻷمازيغية ف 1' &&
+                        field.name !== 'اللغة اﻷمازيغية ف 2' &&
+                        field.name !== 'اللغة اﻷمازيغية ف 3' &&
+                        field.name !== 'اللغة اﻷمازيغية م س' &&
+                        field.name !== 'اﻷمازيغية ش ت م' &&
 
                         field.name !== 'اللغة الفرنسية ف 1' &&
                         field.name !== 'اللغة الفرنسية ف 2' &&
